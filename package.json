@@ -1,0 +1,33 @@
+{
+  "name": "bothan",
+  "version": "0.0.1",
+  "description": "A node.js phantom controller.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha -c spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Yomguithereal/bothan"
+  },
+  "keywords": [
+    "phantomjs"
+  ],
+  "author": "Yomguithereal",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Yomguithereal/bothan/issues"
+  },
+  "homepage": "https://github.com/Yomguithereal/bothan",
+  "dependencies": {
+    "phantomjs": "^1.9.7-12",
+    "faye-websocket": "^0.7.2"
+  },
+  "devDependencies": {
+    "grunt-closure-linter": "^0.1.4",
+    "grunt": "^0.4.5",
+    "grunt-contrib-jshint": "^0.10.0",
+    "mocha": "^1.20.1",
+    "express": "^4.4.5"
+  }
+}

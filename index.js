@@ -5,36 +5,21 @@
  * Exports Bothan main class.
  */
 var helpers = require('./shared/helpers.js'),
-    spynet = require('./src/spynet.js'),
-    spy = require('./src/spy.js');
+    Spynet = require('./src/spynet.js'),
+    Spy = require('./src/spy.js');
 
-// TODO: if port in use, fallback
-var usedPorts = [];
+// Caching the spynet server
+var spynet = null;
 
 function Bothan(params) {
-  var _this = this,
-      p = helpers.extend(params, {port: 8074});
+  var _this = this;
+
+  // If the spynet server is not already running, we launch it
+  if (!spynet)
+    spynet = new Spynet(params);
 
   // Properties
-  this.phantom = null;
-  this.server = null;
-
-  // Initialization
-  this.deploy = function(cb) {
-
-    // Launching server
-    // TODO: launch only once please
-    spynet.create(p, function(server) {
-      this.server = server;
-
-      this.phantom = spy.spawn(p);
-
-      // TEST
-      this.phantom.stdout.on('data', function(data) {
-        console.log(data.toString());
-      });
-    });
-  };
+  this.spy = new Spy(params);
 }
 
 module.exports = Bothan;

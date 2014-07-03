@@ -10,7 +10,8 @@ var path = require('path'),
     phantomjs = require('phantomjs'),
     options = require('./options.js');
 
-function spawn(params) {
+function Spy(params) {
+  var _this = this;
   params = params || {};
 
   var args = [path.join(__dirname + '/../phantomjs/main.js')].concat([
@@ -23,13 +24,22 @@ function spawn(params) {
   ]);
 
   // Starting child process
-  return cp.execFile(phantomjs.path, args, function(err, stdout, stderr) {
-    if (err) {
-      // TODO...
-    }
+  this.phantom = cp.execFile(phantomjs.path, args);
+
+  // Methods
+  this.kill = function() {
+    this.phantom.kill();
+  };
+
+  // Events
+  process.on('exit', function() {
+    _this.kill();
+  });
+
+  // DEBUG
+  this.phantom.stdout.on('data', function() {
+    console.log(arguments);
   });
 }
 
-module.exports = {
-  spawn: spawn
-};
+module.exports = Spy;

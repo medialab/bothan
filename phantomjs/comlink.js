@@ -4,44 +4,77 @@
  *
  * Connect to a WebSocket server for messaging purposes.
  */
-var webpage = require('webpage');
 
-var channel = new WebSocket('ws://localhost:4000');
-
-// channel.send('ta mere');
-
-function Comlink(params) {
-  var _this = this;
+function Comlink() {
+  var self = this;
 
   // Properties
+  this.params = null;
   this.connected = false;
-  this.page = webpage.create();
+  this.ws = null;
+  this.listeners = {};
 
-  // // Methods
-  // this.connect = function(cb) {
-  //   var p = this.page;
+  // Initialization
+  this.setup = function(params) {
 
-  //   p.open('http://localhost:' + params.port, function() {
-  //     p.evaluate(function() {
-  //       var endpoint = document.getElementById('endpoint').value,
-  //           socket = io.connect(endpoint);
-  //     });
+    // Cleanup
+    this.ws = null;
+    this.listeners = {};
+    this.params = params;
 
-  //     _this.connected = true;
-  //     cb();
-  //   });
-  // };
+    // Connecting
+    this.ws = new WebSocket('ws://localhost:' + params.port);
 
-  // this.send = function(data) {
-  //   if (!_this.connected)
-  //     return;
+    // Checking connection
+    this.ws.onopen = function() {
+      self.connected = true;
+    };
 
-  //   var p = this.page;
+    // Binding events
+    this.ws.onmessage = function(msg) {
+      msg = JSON.parse(msg);
 
-  //   p.evaluate(function() {
-  //     socket.send('message', data);
-  //   });
-  // };
+      // Triggering callback if relevant
+      if (msg.header in self.listeners)
+        self.listeners[msg.header].forEach(function(l) {
+          l(msg.data);
+        });
+    };
+  };
+
+  // Methods
+  this.send = function(header, data) {
+    var msg = {header: header, data: data, id: this.params.id};
+
+    function checkConnection() {
+      if (self.connected)
+        _send();
+      else
+        setTimeout(checkConnection, 300);
+    }
+
+    // Looping
+    checkConnection();
+
+    function _send() {
+      self.ws.send(JSON.stringify(msg));
+    }
+  };
+
+  this.handshake = function() {
+    this.send('handshake');
+  };
+
+  this.on = function(header, fn)  {
+    if (typeof fn !== 'function')
+      throw TypeError('Comlink.on: second argument is not a function.');
+
+    this.listeners[header] = this.listeners[header] || [];
+    this.listeners[header].push(fn);
+
+    return this;
+  };
 }
 
-module.exports = Comlink;
+// Singleton export
+module.exports = new Comlink();

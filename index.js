@@ -5,21 +5,34 @@
  * Exports Bothan main class.
  */
 var helpers = require('./shared/helpers.js'),
+    config = require('./config.json'),
     Spynet = require('./src/spynet.js'),
-    Spy = require('./src/spy.js');
+    spawn = require('./src/spawn.js');
 
 // Caching the spynet server
 var spynet = null;
 
-function Bothan(params) {
-  var _this = this;
+function deploy(params, cb) {
 
-  // If the spynet server is not already running, we launch it
+  // Polymorphism
+  if (typeof params === 'function') {
+    cb = params;
+    params = {};
+  }
+
+  // Merging defaults
+  var p = helpers.extend(params, config);
+
+  // If spynet is not already online, we create it
   if (!spynet)
-    spynet = new Spynet(params);
+    spynet = new Spynet(p);
 
-  // Properties
-  this.spy = new Spy(params);
+  // Spawning a spy
+  spawn(p, spynet, function(spy) {
+    cb(spy);
+  });
 }
 
-module.exports = Bothan;
+module.exports = {
+  deploy: deploy
+};

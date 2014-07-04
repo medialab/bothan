@@ -6,48 +6,56 @@
  * a child process of phantomjs.
  */
 
-var io = require('socket.io'),
-    http = require('http'),
-    config = require('../config.json'),
-    extend = require('../shared/helpers.js').extend;
+var WebSocketServer = require('ws').Server,
+    http = require('http');
 
 function Spynet(params) {
-  p = extend(params, {port: config.port});
+  var self = this,
+  params = params || {};
 
-  var endpoint = 'http://localhost:' + p.port;
+  // Launching websocket server
+  this.server = new WebSocketServer({port: params.port});
+  this.listeners = {};
+  this.sockets = {};
 
-  // Creating http server
-  this.server = http.createServer(function(req, res, body) {
-    res.writeHead(200);
-    return res.end(
-      '<!doctype html>' +
-      '<html>' +
-        '<head>' +
-          '<title>Spynet</title>' +
-        '</head>' +
-        '<body>' +
-          'Hello Phantom!' +
-          '<input id="endpoint" type="hidden" value="' + endpoint + '" />' +
-          '<script type="text/javascript" src="' +
-          endpoint + '/socket.io/socket.io.js' + '" ></script>' +
-        '</body>' +
-      '</html>'
-    );
-  });
+  // Events
+  this.server.on('connection', function(ws) {
 
-  // Bootstrapping socket server
-  this.sockets = io(this.server);
+    ws.on('message', function(msg) {
+      msg = JSON.parse(msg);
 
-  // Start listening
-  this.server.listen(p.port);
+      if (!msg.id in self.sockets)
+        self.sockets[msg.id] = ws;
 
-  // Callbacks
-  this.sockets.on('connection', function(socket) {
-    console.log('connection made');
-    socket.on('message', function(from, msg) {
-      console.log(from, msg);
+      if (msg.id in self.listeners && msg.header in self.listeners[msg.id])
+        self.listeners[msg.id][msg.header].forEach(function(l) {
+          l(msg.data, ws);
+        });
     });
   });
+
+  // Methods
+  this.on = function(id, header, fn)  {
+    if (typeof fn !== 'function')
+      throw TypeError('bothan.Spynet.on: second argument is not a function.');
+
+    if (!this.listeners[id])
+      this.listeners[id] = {};
+    if (!this.listeners[id][header])
+      this.listeners[id][header] = [];
+
+    this.listeners[id][header].push(fn);
+
+    return this;
+  };
+
+  this.send = function(id, header, data) {
+    if (!id in this.sockets)
+      throw Error('bothan.Spynet.send: inexistant socket for id: ' + id);
+
+    this.sockets[id].send(JSON.stringify({header: header, data: data}));
+    return this;
+  };
 }
 
 module.exports = Spynet;

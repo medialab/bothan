@@ -5,7 +5,7 @@
  * Phantomjs main controller.
  */
 var system = require('system'),
-    Comlink = require('./comlink.js');
+    comlink = require('./comlink.js');
 
 function checkArguments() {
   var jsonParams = system.args[system.args.length - 1],
@@ -22,10 +22,12 @@ function checkArguments() {
     params;
 }
 
-var params = checkArguments(),
-    comlink = new Comlink(params);
+var params = checkArguments();
 
-// Connecting to Spynet
-// comlink.connect(function() {
-//   comlink.send({hello: 'world'});
-// });
+// Setup the comlink
+comlink.setup(params);
+comlink.handshake();
+
+comlink.on('message', function(msg) {
+  console.log('message received from spynet: ' + msg);
+});

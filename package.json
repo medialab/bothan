@@ -13,7 +13,10 @@
   "keywords": [
     "phantomjs"
   ],
-  "author": "Yomguithereal",
+  "author": {
+    "name": "Yomguithereal",
+    "url": "https://github.com/Yomguithereal"
+  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/Yomguithereal/bothan/issues"

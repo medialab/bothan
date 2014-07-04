@@ -2,7 +2,7 @@
  * Bothan Public Interface
  * ========================
  *
- * Exports Bothan main class.
+ * Exports Bothan main functions.
  */
 var helpers = require('./shared/helpers.js'),
     config = require('./config.json'),

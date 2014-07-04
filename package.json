@@ -1,7 +1,7 @@
 {
   "name": "bothan",
   "version": "0.0.1",
-  "description": "A node.js phantom controller.",
+  "description": "A node.js phantom controller for scraping purposes.",
   "main": "index.js",
   "scripts": {
     "test": "mocha -c spec"

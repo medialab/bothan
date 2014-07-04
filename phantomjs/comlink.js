@@ -31,8 +31,8 @@ function Comlink() {
     };
 
     // Binding events
-    this.ws.onmessage = function(msg) {
-      msg = JSON.parse(msg);
+    this.ws.onmessage = function(e) {
+      var msg = JSON.parse(e.data);
 
       // Triggering callback if relevant
       if (msg.header in self.listeners)

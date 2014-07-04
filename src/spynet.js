@@ -24,7 +24,7 @@ function Spynet(params) {
     ws.on('message', function(msg) {
       msg = JSON.parse(msg);
 
-      if (!msg.id in self.sockets)
+      if (!(msg.id in self.sockets))
         self.sockets[msg.id] = ws;
 
       if (msg.id in self.listeners && msg.header in self.listeners[msg.id])
@@ -50,7 +50,7 @@ function Spynet(params) {
   };
 
   this.send = function(id, header, data) {
-    if (!id in this.sockets)
+    if (!(id in this.sockets))
       throw Error('bothan.Spynet.send: inexistant socket for id: ' + id);
 
     this.sockets[id].send(JSON.stringify({header: header, data: data}));

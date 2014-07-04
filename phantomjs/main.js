@@ -29,5 +29,5 @@ comlink.setup(params);
 comlink.handshake();
 
 comlink.on('message', function(msg) {
-  console.log('message received from spynet: ' + msg);
+  console.log('message received from spynet: ' + {hello: 'world'});
 });

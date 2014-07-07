@@ -29,9 +29,5 @@ var params = checkArguments();
 comlink.setup(params);
 comlink.handshake();
 
-// Starting the page
+// Starting the pager
 var pager = new Pager(comlink, params);
-
-comlink.on('message', function(msg) {
-  console.log('message received from spynet: ' + JSON.stringify(msg, undefined, 2));
-});

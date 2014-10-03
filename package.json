@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Yomguithereal/bothan"
+    "url": "https://github.com/medialab/bothan"
   },
   "keywords": [
     "phantomjs"
@@ -19,18 +19,14 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Yomguithereal/bothan/issues"
+    "url": "https://github.com/medialab/bothan/issues"
   },
-  "homepage": "https://github.com/Yomguithereal/bothan",
+  "homepage": "https://github.com/medialab/bothan",
   "dependencies": {
-    "phantomjs": "^1.9.7-12",
-    "ws": "^0.4.31"
+    "ws": "~0.4.32",
+    "phantomjs": "~1.9.10"
   },
   "devDependencies": {
-    "grunt-closure-linter": "^0.1.4",
-    "grunt": "^0.4.5",
-    "grunt-contrib-jshint": "^0.10.0",
-    "mocha": "^1.20.1",
-    "express": "^4.4.5"
+    "mocha": "~1.21.4"
   }
 }

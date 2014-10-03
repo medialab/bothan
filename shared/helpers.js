@@ -2,7 +2,7 @@
  * Bothan Shared helpers
  * ======================
  *
- * Useful functions shared by both node and phantomjs.
+ * Useful batch of functions used by both phantomjs and nodejs scripts.
  */
 
 // Is the var a plain object?

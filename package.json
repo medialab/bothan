@@ -4,7 +4,7 @@
   "description": "A node.js phantom controller for scraping purposes.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha -c -R spec"
+    "test": "mocha -R spec"
   },
   "repository": {
     "type": "git",
@@ -24,7 +24,8 @@
   "homepage": "https://github.com/medialab/bothan",
   "dependencies": {
     "ws": "~0.4.32",
-    "phantomjs": "~1.9.10"
+    "phantomjs": "~1.9.10",
+    "colback": "~0.1.0"
   },
   "devDependencies": {
     "mocha": "~1.21.4"

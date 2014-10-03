@@ -29,6 +29,12 @@ function extend() {
   return res;
 }
 
+// Converts a camelcase word into a hyphen separated one
+function camelToHyphen(name) {
+  return name.replace(/([a-zA-Z])(?=[A-Z])/g, '$1-').toLowerCase();
+}
+
 module.exports = {
+  camelToHyphen: camelToHyphen,
   extend: extend
 };

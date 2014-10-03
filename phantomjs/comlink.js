@@ -67,7 +67,7 @@ function Comlink() {
 
   this.on = function(header, fn)  {
     if (typeof fn !== 'function')
-      throw TypeError('Comlink.on: second argument is not a function.');
+      throw TypeError('Phantom.Comlink.on: second argument is not a function.');
 
     this.listeners[header] = this.listeners[header] || [];
     this.listeners[header].push(fn);

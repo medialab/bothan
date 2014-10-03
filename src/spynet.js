@@ -53,7 +53,7 @@ function Spynet(params) {
     if (!(id in this.sockets))
       throw Error('bothan.Spynet.send: inexistant socket for id: ' + id);
 
-    this.sockets[id].send(JSON.stringify({header: header, data: data}));
+    this.sockets[id].send(JSON.stringify({header: header, data: data, id: id}));
     return this;
   };
 }

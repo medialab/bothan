@@ -5,7 +5,8 @@
  * Phantomjs main controller.
  */
 var system = require('system'),
-    comlink = require('./comlink.js');
+    comlink = require('./comlink.js'),
+    Pager = require('./pager.js');
 
 function checkArguments() {
   var jsonParams = system.args[system.args.length - 1],
@@ -28,6 +29,5 @@ var params = checkArguments();
 comlink.setup(params);
 comlink.handshake();
 
-comlink.on('message', function(msg) {
-  console.log('message received from spynet: ' + {hello: 'world'});
-});
+// Starting the pager
+var pager = new Pager(comlink, params);

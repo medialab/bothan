@@ -37,8 +37,8 @@ Spy.prototype.on = function(header, fn) {
   return this.spynet.on(this.id, header, fn);
 };
 
-Spy.prototype.send = function(header, fn) {
-  return this.spynet.send(this.id, header, fn);
+Spy.prototype.send = function(header, data) {
+  return this.spynet.send(this.id, header, data);
 };
 
 // Spawning function
@@ -51,6 +51,8 @@ function spawn(params, spynet, cb) {
     JSON.stringify({
       identity: 'many bothans died to bring us this information',
       port: params.port,
+      debug: params.debug,
+      injections: params.injections || [],
       id: id
     })
   ]);

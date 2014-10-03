@@ -4,7 +4,7 @@
   "description": "A node.js phantom controller for scraping purposes.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha -c spec"
+    "test": "mocha -c -R spec"
   },
   "repository": {
     "type": "git",

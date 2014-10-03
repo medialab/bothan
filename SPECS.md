@@ -26,6 +26,7 @@ Features
 * Events would be of:
     * phantom:log (data)
     * phantom:error (data)
+    * phantom:disconnect (error: alias)
     * page:log (pageInfo, data)
     * page:error (pageInfo, data)
     * page:message (pageInfo, data)

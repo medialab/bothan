@@ -34,7 +34,27 @@ function camelToHyphen(name) {
   return name.replace(/([a-zA-Z])(?=[A-Z])/g, '$1-').toLowerCase();
 }
 
+// From configuration object to command line arguments
+function toCLIArgs(o) {
+  var args = [];
+
+  for (var k in o)
+    args.push('--' + camelToHyphen(k) + '="' + o[k] + '"');
+
+  return args;
+};
+
+// Lazy asynchronous execution
+function lazy(cond, then, next) {
+  if (typeof cond === 'function' ? !cond() : !cond)
+    then(next);
+  else
+    next();
+}
+
 module.exports = {
   camelToHyphen: camelToHyphen,
-  extend: extend
+  extend: extend,
+  lazy: lazy,
+  toCLIArgs: toCLIArgs
 };

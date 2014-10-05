@@ -11,44 +11,57 @@
 
 // Dependencies
 var WebSocketServer = require('ws').Server,
+    EventEmitter = require('events').EventEmitter,
     http = require('http'),
     Messenger = require('colback').messenger,
-    config = require('../config.json'),
+    config = require('../shared/config.js'),
     helpers = require('../shared/helpers.js');
 
 var defaults = {
   port: config.port
 };
 
-var name = 0;
-
 // Main class
 function Spynet(params) {
-  var self = this;
+  var self = this,
+      ee = new EventEmitter();
 
   // Extending default settings
   params = helpers.extend(params || {}, defaults);
 
   // Launching server
   this.server = new WebSocketServer({port: params.port});
-  this.sockets = [];
+
+  // Extending server
+  this.server.broadcast = function(data) {
+    this.clients.forEach(function(client) {
+      client.emit(data);
+    });
+  };
+
+  // Building messenger
+  this.messenger = new Messenger({
+    name: 'Spynet',
+    paradigm: 'modern',
+    emitter: function(data) {
+      self.server.broadcast(JSON.stringify(data));
+    },
+    receptor: function(callback) {
+      ee.on('message', callback);
+    }
+  });
+
+  // Giving access to some messenging functions
+  this.on = this.messenger.on;
 
   // On socket connection
   this.server.on('connection', function(socket) {
-    if (!~self.sockets.indexOf(socket))
-      self.sockets.push(socket);
+    socket.on('message', function(data) {
+      ee.emit('message', JSON.parse(data));
+    });
   });
 
   // On socket disconnection
-
-  // var messenger = new Messenger({
-  //   paradigm: 'modern',
-  //   receptor: 'test',
-  //   emitter: function(data) {
-  //     var serializedData = JSON.stringify(dat);
-
-  //   }
-  // });
 }
 
 module.exports = Spynet;

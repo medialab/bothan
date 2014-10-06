@@ -7,7 +7,8 @@
 var system = require('system'),
     args = system.args,
     config = require('../shared/config.js'),
-    comlink = require('./comlink.js');
+    comlink = require('./comlink.js'),
+    page = require('./custom_page.js');
 
 // Checking CLI arguments so we get proper configuration from parent
 var params = JSON.parse(args[1]);
@@ -20,5 +21,5 @@ comlink.setup(params, function() {
 
   // Perform tricks here
   if (params.bindings)
-    require(params.bindings)(comlink.messenger);
+    require(params.bindings)(comlink.messenger, page);
 });

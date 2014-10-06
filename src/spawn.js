@@ -97,7 +97,8 @@ module.exports = function(spynet, params, callback) {
     debug: params.debug,
     name: name,
     spynet: spynet.name,
-    bindings: params.bindings || null
+    bindings: params.bindings || null,
+    params: params.params || {}
   }));
 
   // Command line arguments for phantom

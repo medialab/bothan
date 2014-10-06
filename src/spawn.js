@@ -29,6 +29,8 @@ function Spy(name, spynet, phantom) {
 
   // Registering some events
   this.phantom.stdout.on('data', function(data) {
+    data = data.substring(0, data.length - 1);
+
     if (~data.search(/Error:/))
       self.emit('phantom:error', data);
     else
@@ -70,7 +72,8 @@ module.exports = function(spynet, params, callback) {
     passphrase: config.passphrase,
     port: params.port || config.port,
     debug: params.debug,
-    name: name
+    name: name,
+    bindings: params.bindings || null
   }));
 
   // Command line arguments for phantom
@@ -82,10 +85,11 @@ module.exports = function(spynet, params, callback) {
 
   // Waiting for handshake
   var failureTimeout = setTimeout(function() {
+    spy.kill();
     callback(new Error('timeout'));
   }, 2000);
 
-  spynet.from(name).on('handshake', function(data, reply) {
+  spynet.messenger.from(name).once('handshake', function(data, reply) {
     clearTimeout(failureTimeout);
     reply({ok: true});
     callback(null, spy);

@@ -38,8 +38,8 @@ function Comlink() {
       self.messenger = new Messenger({
         name: params.name,
         receptor: function(callback) {
-          self.ws.onmessage = function(data) {
-            callback(JSON.parse(data));
+          self.ws.onmessage = function(msg) {
+            callback(JSON.parse(msg.data));
           };
         },
         emitter: function(data) {
@@ -49,7 +49,6 @@ function Comlink() {
 
       // Performing handshake
       self.messenger.to('Spynet').request('handshake').then(function(response) {
-        console.log(response);
 
         // Next
         next();

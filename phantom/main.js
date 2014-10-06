@@ -19,4 +19,6 @@ if (params.passphrase !== config.passphrase)
 comlink.setup(params, function() {
 
   // Perform tricks here
+  if (params.bindings)
+    require(params.bindings)(comlink.messenger);
 });

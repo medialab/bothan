@@ -35,14 +35,13 @@ function Spynet(params) {
   // Extending server
   this.server.broadcast = function(data) {
     this.clients.forEach(function(client) {
-      client.emit(data);
+      client.send(data);
     });
   };
 
   // Building messenger
   this.messenger = new Messenger({
     name: 'Spynet',
-    paradigm: 'modern',
     emitter: function(data) {
       self.server.broadcast(JSON.stringify(data));
     },
@@ -50,9 +49,6 @@ function Spynet(params) {
       ee.on('message', callback);
     }
   });
-
-  // Giving access to some messenging functions
-  this.from = this.messenger.from;
 
   // On socket connection
   this.server.on('connection', function(socket) {

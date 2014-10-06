@@ -41,7 +41,7 @@ describe('spawn', function() {
         done();
       });
 
-      spy.send('hello');
+      spy.messenger.send('hello');
     });
 
     it('should be possible to subscribe to the child process errors.', function(done) {
@@ -50,7 +50,16 @@ describe('spawn', function() {
         done();
       });
 
-      spy.send('error');
+      spy.messenger.send('error');
+    });
+
+    it('should be possible to subscribe to the child process close.', function(done) {
+      spy.once('phantom:close', function(data) {
+        assert(data.code === 0);
+        done();
+      });
+
+      spy.messenger.send('close');
     });
 
     after(function() {

@@ -25,7 +25,8 @@
   "dependencies": {
     "ws": "~0.4.32",
     "phantomjs": "~1.9.10",
-    "colback": "~0.1.0"
+    "colback": "~0.1.0",
+    "uuid": "~2.0.1"
   },
   "devDependencies": {
     "mocha": "~1.21.4"

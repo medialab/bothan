@@ -7,13 +7,11 @@
 var path = require('path'),
     cp = require('child_process'),
     util = require('util'),
+    uuid = require('uuid'),
     EventEmitter = require('events').EventEmitter,
     phantomjs = require('phantomjs'),
     helpers = require('../shared/helpers.js'),
     config = require('../shared/config.js');
-
-// Internals
-var counter = 0;
 
 // Spy class
 function Spy(name, spynet, phantom) {
@@ -28,12 +26,16 @@ function Spy(name, spynet, phantom) {
   this.killed = false;
 
   // Binding some of the messenger methods
-  this.send = function(head, message) {
-    return spynet.messenger.to(this.name).send(head, message);
-  };
-
-  this.request = function(head, message, params) {
-    return spynet.messenger.to(this.name).request(head, message, params);
+  this.messenger = {
+    send: function(head, message) {
+      return spynet.messenger.to(self.name).send(head, message);
+    },
+    request: function(head, message, params) {
+      return spynet.messenger.to(self.name).request(head, message, params);
+    },
+    on: function(head, fn) {
+      return spynet.messenger.from(self.name).on(head, fn);
+    }
   };
 
   // On stdout
@@ -54,7 +56,7 @@ function Spy(name, spynet, phantom) {
   // On close
   this.phantom.on('close', function(code, signal) {
     if (!self.killed)
-      self.emit('phantom:closed', {code: code, signal: signal});
+      self.emit('phantom:close', {code: code, signal: signal});
     self.killed;
   });
 
@@ -68,6 +70,9 @@ util.inherits(Spy, EventEmitter);
 
 // Spy Prototype
 Spy.prototype.kill = function() {
+  if (this.killed)
+    return;
+
   this.killed = true;
   this.phantom.kill();
 };
@@ -77,7 +82,7 @@ module.exports = function(spynet, params, callback) {
   params = params || {};
 
   // Giving a name
-  var name = params.name || 'spy' + (counter++);
+  var name = params.name || 'Spy[' + uuid.v4() + ']';
 
   // Composing unix command
   var args = [];
@@ -91,6 +96,7 @@ module.exports = function(spynet, params, callback) {
     port: params.port || config.port,
     debug: params.debug,
     name: name,
+    spynet: spynet.name,
     bindings: params.bindings || null
   }));
 

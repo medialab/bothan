@@ -22,6 +22,7 @@ function Comlink() {
   this.ws = null;
   this.messenger = null;
   this.connected = false;
+  this.name = null;
 
   // Methods
   this.setup = function(params, next) {
@@ -48,11 +49,13 @@ function Comlink() {
       });
 
       // Performing handshake
-      self.messenger.to('Spynet').request('handshake').then(function(response) {
+      self.messenger
+        .to(params.spynet)
+        .request('handshake').then(function(response) {
 
-        // Next
-        next();
-      });
+          // Next
+          next();
+        });
     };
   }
 }

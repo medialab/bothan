@@ -12,4 +12,9 @@ module.exports = function(messenger) {
   messenger.on('error', function() {
     throw new Error('Achtung!');
   });
+
+  // Close
+  messenger.on('close', function() {
+    phantom.exit(0);
+  });
 };

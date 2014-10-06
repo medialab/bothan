@@ -41,7 +41,7 @@ describe('spawn', function() {
         done();
       });
 
-      spynet.messenger.to('bindings').send('hello');
+      spy.send('hello');
     });
 
     it('should be possible to subscribe to the child process errors.', function(done) {
@@ -50,7 +50,7 @@ describe('spawn', function() {
         done();
       });
 
-      spynet.messenger.to('bindings').send('error');
+      spy.send('error');
     });
 
     after(function() {

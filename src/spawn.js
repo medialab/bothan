@@ -24,10 +24,18 @@ function Spy(name, spynet, phantom) {
 
   // Properties
   this.name = name;
-  this.spynet = spynet;
   this.phantom = phantom;
 
-  // Registering some events
+  // Binding some of the messenger methods
+  this.send = function(head, message) {
+    return spynet.messenger.to(this.name).send(head, message);
+  };
+
+  this.request = function(head, message, params) {
+    return spynet.messenger.to(this.name).request(head, message, params);
+  };
+
+  // On stdout
   this.phantom.stdout.on('data', function(data) {
     data = data.substring(0, data.length - 1);
 
@@ -37,6 +45,7 @@ function Spy(name, spynet, phantom) {
       self.emit('phantom:log', data);
   });
 
+  // On stderr
   this.phantom.stderr.on('data', function(data) {
     self.emit('phantom:error', data);
   });

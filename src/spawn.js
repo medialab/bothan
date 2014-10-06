@@ -25,6 +25,7 @@ function Spy(name, spynet, phantom) {
   // Properties
   this.name = name;
   this.phantom = phantom;
+  this.killed = false;
 
   // Binding some of the messenger methods
   this.send = function(head, message) {
@@ -50,6 +51,13 @@ function Spy(name, spynet, phantom) {
     self.emit('phantom:error', data);
   });
 
+  // On close
+  this.phantom.on('close', function(code, signal) {
+    if (!self.killed)
+      self.emit('phantom:closed', {code: code, signal: signal});
+    self.killed;
+  });
+
   // Killing the child process with parent
   process.on('exit', function() {
     self.kill();
@@ -60,6 +68,7 @@ util.inherits(Spy, EventEmitter);
 
 // Spy Prototype
 Spy.prototype.kill = function() {
+  this.killed = true;
   this.phantom.kill();
 };
 

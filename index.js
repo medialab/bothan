@@ -16,14 +16,19 @@ module.exports = {
       spynet = null;
     }
 
+    params = params || {};
+
     if (typeof callback !== 'function')
       throw Error('bothan.deploy: no valid callback provided.');
 
+    if (!spynet) {
+      var spynetParams = {};
+      params.port && (spynetParams.port = params.port)
+      spynet = new Spynet(spynetParams);
+    }
+
     if (!(spynet instanceof Spynet))
       throw Error('bothan.deploy: provided spynet instance is not valid.');
-
-    if (!spynet)
-      spynet = new Spynet({port: params.port});
 
     spawn(spynet, params, callback);
   }

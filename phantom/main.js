@@ -20,5 +20,5 @@ comlink.setup(params, function() {
 
   // Perform tricks here
   if (params.bindings)
-    require(params.bindings)(comlink.messenger, params.params);
+    require(params.bindings)(comlink.messenger, params.data);
 });

@@ -23,12 +23,12 @@ var defaults = {
 };
 
 // Main class
-function Spynet(params) {
+function Spynet(p) {
   var self = this,
       ee = new EventEmitter();
 
   // Extending default settings
-  params = helpers.extend(params || {}, defaults);
+  params = helpers.extend(p || {}, defaults);
 
   // Launching server
   this.name = params.name || 'Spynet[' + uuid.v4() + ']';

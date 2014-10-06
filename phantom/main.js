@@ -15,6 +15,11 @@ var params = JSON.parse(args[1]);
 if (params.passphrase !== config.passphrase)
   throw Error('bothan.phantom: wrong JSON configuration provided.');
 
+// Fixing error to stderr
+console.error = function () {
+  system.stderr.write(Array.prototype.join.call(arguments, ' ') + '\n');
+};
+
 // Setup the comlink
 comlink.setup(params, function() {
 

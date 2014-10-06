@@ -52,7 +52,7 @@ function Spynet(params) {
   });
 
   // Giving access to some messenging functions
-  this.on = this.messenger.on;
+  this.from = this.messenger.from;
 
   // On socket connection
   this.server.on('connection', function(socket) {

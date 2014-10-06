@@ -9,10 +9,14 @@ var Messenger = require('colback').messenger,
     helpers = require('../shared/helpers.js'),
     config = require('../shared/config.js');
 
+// Helpers
+function endpoint(host, port) {
+  return 'ws://' + (host || 'localhost') + ':' + (port || config.port);
+}
+
 // Main class
-function Comlink(params) {
+function Comlink() {
   var self = this;
-  params = params || {};
 
   // Properties
   this.ws = null;
@@ -20,14 +24,36 @@ function Comlink(params) {
   this.connected = false;
 
   // Methods
-  this.setup = function(callback) {
+  this.setup = function(params, next) {
+    params = params || {};
 
     // Connecting to websocket server
-    this.ws = new WebSocket('ws://localhost:' + (params.port || config.port));
+    this.ws = new WebSocket(endpoint(params.host, params.port));
 
     // Waiting for effective connection
     this.ws.onopen = function() {
       self.connected = true;
+
+      // Creating messenger
+      self.messenger = new Messenger({
+        name: params.name,
+        receptor: function(callback) {
+          self.ws.onmessage = function(data) {
+            callback(JSON.parse(data));
+          };
+        },
+        emitter: function(data) {
+          self.ws.send(JSON.stringify(data));
+        }
+      });
+
+      // Performing handshake
+      self.messenger.to('Spynet').request('handshake').then(function(response) {
+        console.log(response);
+
+        // Next
+        next();
+      });
     };
   }
 }

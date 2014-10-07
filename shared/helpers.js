@@ -44,17 +44,8 @@ function toCLIArgs(o) {
   return args;
 };
 
-// Lazy asynchronous execution
-function lazy(cond, then, next) {
-  if (typeof cond === 'function' ? !cond() : !cond)
-    then(next);
-  else
-    next();
-}
-
 module.exports = {
   camelToHyphen: camelToHyphen,
   extend: extend,
-  lazy: lazy,
   toCLIArgs: toCLIArgs
 };

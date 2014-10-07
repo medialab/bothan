@@ -55,7 +55,7 @@ function Comlink() {
 
           // Next
           next();
-        });
+        }).done();
     };
   }
 }

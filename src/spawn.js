@@ -24,6 +24,7 @@ function Spy(name, spynet, phantom) {
   this.name = name;
   this.phantom = phantom;
   this.killed = false;
+  this.spynet = spynet;
 
   // Binding some of the messenger methods
   this.messenger = {
@@ -117,6 +118,7 @@ module.exports = function(spynet, params, callback) {
   spynet.messenger.from(name).once('handshake', function(data, reply) {
     clearTimeout(failureTimeout);
     reply({ok: true});
+
     callback(null, spy);
   });
 };

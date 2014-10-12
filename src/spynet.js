@@ -62,4 +62,9 @@ function Spynet(p) {
   // On socket disconnection
 }
 
+// Prototype
+Spynet.prototype.close = function() {
+  return this.server.close();
+};
+
 module.exports = Spynet;

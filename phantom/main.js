@@ -21,7 +21,11 @@ console.error = function () {
 };
 
 // Setup the comlink
-comlink.setup(params, function() {
+comlink.setup(params, function(err) {
+
+  // If the socket server timed out, we exit
+  if (err)
+    return phantom.exit(1);
 
   // Perform tricks here
   if (params.bindings)

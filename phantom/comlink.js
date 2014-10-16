@@ -25,6 +25,7 @@ function Comlink() {
   this.name = null;
 
   // Methods
+  // TODO: implement a timeout
   this.setup = function(params, next) {
     params = params || {};
 

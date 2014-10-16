@@ -14,7 +14,7 @@ var WebSocketServer = require('ws').Server,
     EventEmitter = require('events').EventEmitter,
     http = require('http'),
     uuid = require('uuid'),
-    Messenger = require('colback').messenger,
+    Messenger = require('estafet'),
     config = require('../shared/config.js'),
     helpers = require('../shared/helpers.js');
 
@@ -35,6 +35,7 @@ function Spynet(p) {
   this.server = new WebSocketServer({port: params.port});
 
   // Extending server
+  // TODO: find way to send unilateraly
   this.server.broadcast = function(data) {
     this.clients.forEach(function(client) {
       client.send(data);
@@ -42,8 +43,7 @@ function Spynet(p) {
   };
 
   // Building messenger
-  this.messenger = new Messenger({
-    name: this.name,
+  this.messenger = new Messenger(this.name, {
     emitter: function(data) {
       self.server.broadcast(JSON.stringify(data));
     },
@@ -59,7 +59,7 @@ function Spynet(p) {
     });
   });
 
-  // On socket disconnection
+  // TODO: Handle socket disconnection
 }
 
 // Prototype

@@ -27,17 +27,7 @@ function Spy(name, spynet, phantom) {
   this.spynet = spynet;
 
   // Binding some of the messenger methods
-  this.messenger = {
-    send: function(head, message) {
-      return spynet.messenger.to(self.name).send(head, message);
-    },
-    request: function(head, message, params) {
-      return spynet.messenger.to(self.name).request(head, message, params);
-    },
-    on: function(head, fn) {
-      return spynet.messenger.from(self.name).on(head, fn);
-    }
-  };
+  this.messenger = spynet.messenger.conversation(name);
 
   // On stdout
   this.phantom.stdout.on('data', function(data) {
@@ -115,7 +105,7 @@ module.exports = function(spynet, params, callback) {
     callback(new Error('timeout'));
   }, 2000);
 
-  spynet.messenger.from(name).once('handshake', function(data, reply) {
+  spy.messenger.once('handshake', function(data, reply) {
     clearTimeout(failureTimeout);
     reply({ok: true});
 

@@ -5,7 +5,7 @@
  * The Comlink class enables direct communication, through websockets, with the
  * parent of the phantom child process.
  */
-var Messenger = require('colback').messenger,
+var Messenger = require('estafet'),
     helpers = require('../shared/helpers.js'),
     config = require('../shared/config.js');
 
@@ -36,8 +36,7 @@ function Comlink() {
       self.connected = true;
 
       // Creating messenger
-      self.messenger = new Messenger({
-        name: params.name,
+      self.messenger = new Messenger(params.name, {
         receptor: function(callback) {
           self.ws.onmessage = function(msg) {
             callback(JSON.parse(msg.data));
@@ -49,13 +48,7 @@ function Comlink() {
       });
 
       // Performing handshake
-      self.messenger
-        .to(params.spynet)
-        .request('handshake').then(function(response) {
-
-          // Next
-          next();
-        }).done();
+      self.messenger.to(params.spynet).request('handshake', next);
     };
   }
 }

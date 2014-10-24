@@ -6,6 +6,5 @@
  */
 
 module.exports = {
-  passphrase: 'Many bothans died to bring us this information.',
-  port: 8074
+  passphrase: 'Many bothans died to bring us this information.'
 };

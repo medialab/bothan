@@ -84,7 +84,7 @@ module.exports = function(spynet, params, callback) {
   // JSON parameters
   args.push(JSON.stringify({
     passphrase: config.passphrase,
-    port: params.port || config.port,
+    port: spynet.port,
     debug: params.debug,
     name: name,
     spynet: spynet.name,

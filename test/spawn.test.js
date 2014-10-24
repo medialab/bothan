@@ -3,7 +3,7 @@ var assert = require('assert'),
     spawn = require('../src/spawn.js');
 
 describe('spawn', function() {
-  var spynet = new Spynet({port: 8074});
+  var spynet = new Spynet();
 
   describe('basic cases', function() {
     it('should be able to spawn a simple phantom.', function(done) {

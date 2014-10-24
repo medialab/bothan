@@ -14,25 +14,19 @@ var WebSocketServer = require('ws').Server,
     EventEmitter = require('events').EventEmitter,
     http = require('http'),
     uuid = require('uuid'),
-    Messenger = require('estafet'),
-    config = require('../shared/config.js'),
-    helpers = require('../shared/helpers.js');
-
-var defaults = {
-  port: config.port
-};
+    Messenger = require('estafet');
 
 // Main class
-function Spynet(p) {
+function Spynet(params) {
   var self = this,
       ee = new EventEmitter();
 
-  // Extending default settings
-  params = helpers.extend(p || {}, defaults);
+  params = params || {};
 
   // Launching server
   this.name = params.name || 'Spynet[' + uuid.v4() + ']';
-  this.server = new WebSocketServer({port: params.port});
+  this.server = new WebSocketServer({port: params.port || 8074});
+  this.port = this.server.options.port;
 
   // Extending server
   // TODO: find way to send unilateraly

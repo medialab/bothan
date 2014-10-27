@@ -83,17 +83,16 @@ module.exports = function(spynet, params, callback) {
 
   // JSON parameters
   args.push(JSON.stringify({
+    name: name,
     passphrase: config.passphrase,
     port: spynet.port,
-    debug: params.debug,
-    name: name,
     spynet: spynet.name,
     bindings: params.bindings || null,
     data: params.data || {}
   }));
 
   // Command line arguments for phantom
-  args.concat(helpers.toCLIArgs(params.args || {}));
+  args = args.concat(helpers.toCLIArgs(params.args || {}));
 
   // Spawning
   var phantom = cp.execFile(phantomjs.path, args),

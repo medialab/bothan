@@ -101,8 +101,8 @@ module.exports = function(spynet, params, callback) {
   // Waiting for handshake
   var failureTimeout = setTimeout(function() {
     spy.kill();
-    callback(new Error('timeout'));
-  }, 2000);
+    callback(new Error('handshake-timeout'));
+  }, params.handshakeTimeout || 5000);
 
   spy.messenger.once('handshake', function(data, reply) {
     clearTimeout(failureTimeout);

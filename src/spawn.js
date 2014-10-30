@@ -26,7 +26,6 @@ function Spy(name, args) {
   this.name = name;
   this.args = args;
   this.phantom = null;
-  this.killed = false;
 
   // Binding some of the messenger methods
   this.messenger = spynet.messenger.conversation(name);
@@ -76,9 +75,7 @@ Spy.prototype.start = function(timeout, callback) {
 
   // On close
   this.phantom.once('close', function(code, signal) {
-    if (!self.killed)
-      self.emit('phantom:close', {code: code, signal: signal});
-    self.killed;
+    self.emit('phantom:close', {code: code, signal: signal});
   });
 
   return this;

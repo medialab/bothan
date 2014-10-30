@@ -1,7 +1,8 @@
 var assert = require('assert'),
     spawn = require('../src/spawn.js'),
     bothan = require('../index.js'),
-    spynet = require('../src/spynet.js');
+    spynet = require('../src/spynet.js'),
+    async = require('async');
 
 describe('spawn', function() {
 
@@ -84,6 +85,34 @@ describe('spawn', function() {
 
     after(function() {
       spy.kill();
+    });
+  });
+
+  describe('parallel', function() {
+
+    it('should be possible to spawn several phantoms at the same time.', function(done) {
+      async.parallel([
+        function (next) {
+          spawn({name: 'one'}, function(err, spy) {
+            assert.strictEqual(spy.name, 'one');
+            assert(!err);
+            setTimeout(function() {
+              spy.kill();
+              next();
+            }, 100);
+          });
+        },
+        function (next) {
+          spawn({name: 'two'}, function(err, spy) {
+            assert.strictEqual(spy.name, 'two');
+            assert(!err);
+            setTimeout(function() {
+              spy.kill();
+              next();
+            }, 100);
+          });
+        }
+      ], done);
     });
   });
 });

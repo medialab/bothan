@@ -1,20 +1,20 @@
-module.exports = function(messenger) {
-
+module.exports = function(parent) {
+console.log('here');
   // Alerting parent
-  messenger.send('ok', {ok: true});
+  parent.send('ok', {ok: true});
 
   // Hello
-  messenger.on('hello', function() {
+  parent.on('hello', function() {
     console.log('Hello world!');
   });
 
   // Error
-  messenger.on('error', function() {
+  parent.on('error', function() {
     throw new Error('Achtung!');
   });
 
   // Close
-  messenger.on('close', function() {
+  parent.on('close', function() {
     phantom.exit(0);
   });
 };

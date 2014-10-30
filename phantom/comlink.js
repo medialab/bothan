@@ -54,7 +54,7 @@ function Comlink() {
       // Performing handshake
       self.parent.request('handshake', next);
     };
-  }
+  };
 }
 
 module.exports = new Comlink();

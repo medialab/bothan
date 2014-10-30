@@ -42,7 +42,7 @@ function toCLIArgs(o) {
     args.push('--' + camelToHyphen(k) + '="' + o[k] + '"');
 
   return args;
-};
+}
 
 module.exports = {
   camelToHyphen: camelToHyphen,

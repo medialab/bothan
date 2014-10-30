@@ -23,10 +23,13 @@ function Spynet() {
   this.ee = new EventEmitter();
   this.name = 'Spynet';
   this.port = config.port;
+
   this.server = null;
   this.messenger = null;
   this.running = false;
-  this.spies = [];
+  this.hanging = false;
+  this.hang = null;
+  this.spies = {};
 }
 
 // Prototype
@@ -38,56 +41,103 @@ Spynet.prototype.listen = function(port, errback) {
     port = null;
   }
 
+  if (typeof errback !== 'function')
+    throw Error('bothan.spynet.listen: not callback provided.');
+
   if (this.running)
-    throw Error('bothan.spynet: already running.');
+    throw Error('bothan.spynet.listen: already running.');
+
+  if (this.hanging)
+    return this.ee.once('connected', function() {
+      errback(null);
+    });
 
   this.port = port || config.port;
+  this.hanging = true;
 
   // Launching server
   this.server = new WebSocketServer({port: this.port});
-  if (typeof errback === 'function')
-    this.server.once('error', function(err) {
-      self.running = false;
-      errback(err);
-    });
-  this.running = true;
 
-  // Extending the server for broadcast
-  this.server.broadcast = function(data) {
-    this.clients.forEach(function(client) {
-      client.send(data);
+  // On error
+  this.server.once('error', function(err) {
+    self.hanging = false;
+    self.running = false;
+    errback(err);
+  });
+
+  // On success
+  this.server.once('listening', function() {
+    self.running = true;
+    self.hanging = false;
+
+    // Extending the server for broadcast
+    self.server.broadcast = function(data) {
+      self.clients.forEach(function(client) {
+        client.send(data);
+      });
+    };
+
+    // Building the messenger
+    self.messenger = new Messenger(self.name, {
+      emitter: function(data, to) {
+        var str = JSON.stringify(data);
+
+        if (!to)
+          self.server.broadcast(str);
+        else
+          self.spies[to].socket.send(str);
+      },
+      receptor: function(callback) {
+        self.ee.on('message', callback);
+      }
     });
+
+    // On socket connection
+    self.server.on('connection', function(socket) {
+
+      // On incoming message
+      socket.on('message', function(str) {
+        var data = JSON.parse(str);
+
+        // Registering socket
+        self.addSpy(data.from, socket);
+
+        self.ee.emit('message', data);
+      });
+    });
+
+    self.ee.emit('connected');
+
+    errback(null);
+  });
+};
+
+Spynet.prototype.addSpy = function(name, socket) {
+  this.spies[name] = {
+    socket: socket
   };
+  return this;
+};
 
-  // Building the messenger
-  this.messenger = new Messenger(this.name, {
-    emitter: function(data) {
-      self.server.broadcast(JSON.stringify(data));
-    },
-    receptor: function(callback) {
-      self.ee.on('message', callback);
-    }
-  });
+Spynet.prototype.dropSpy = function(name) {
+  if (name in this.spies)
+    delete this.spies[name];
 
-  // On socket connection
-  // TODO: assign name to socket so we can be finer than broadcast
-  this.server.on('connection', function(socket) {
-    socket.on('message', function(data) {
-      self.ee.emit('message', JSON.parse(data));
-    });
-  });
-
-  // TODO: Handle socket disconnection
-
-  errback(null);
+  if (!Object.keys(this.spies).length)
+    this.close();
   return this;
 };
 
 Spynet.prototype.close = function() {
+  if (!this.running)
+    return;
 
   // Shooting messenger
   this.messenger.shoot();
   this.messenger = null;
+
+  // Dropping spies
+  this.spies = {};
 
   // Closing server
   this.server.close();
@@ -95,6 +145,7 @@ Spynet.prototype.close = function() {
 
   // State
   this.running = false;
+  this.hanging = false;
   return this;
 };
 

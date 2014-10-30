@@ -4,7 +4,7 @@
   "description": "A node.js phantom controller for scraping purposes.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha -R spec"
+    "test": "gulp test"
   },
   "repository": {
     "type": "git",
@@ -25,11 +25,15 @@
   "dependencies": {
     "async": "^0.9.0",
     "estafet": "git+https://github.com/Yomguithereal/estafet.git",
+    "lodash": "^2.4.1",
     "phantomjs": "~1.9.10",
     "uuid": "~2.0.1",
     "ws": "~0.4.32"
   },
   "devDependencies": {
+    "gulp": "^3.8.9",
+    "gulp-jshint": "^1.8.6",
+    "gulp-mocha": "^1.1.1",
     "mocha": "~1.21.4"
   }
 }

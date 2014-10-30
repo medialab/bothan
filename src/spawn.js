@@ -82,10 +82,11 @@ Spy.prototype.start = function(timeout, callback) {
 };
 
 Spy.prototype.kill = function() {
-  if (this.killed)
-    return;
 
-  this.killed = true;
+  // Removing from spynet
+  spynet.dropSpy(this.name);
+
+  // Killing the child process
   this.phantom.kill();
 };
 

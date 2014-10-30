@@ -44,8 +44,14 @@ function toCLIArgs(o) {
   return args;
 }
 
+// Creating a range
+function range(len) {
+  return Array.apply(null, Array(len)).map(function (_, i) {return i;});
+}
+
 module.exports = {
   camelToHyphen: camelToHyphen,
   extend: extend,
+  range: range,
   toCLIArgs: toCLIArgs
 };

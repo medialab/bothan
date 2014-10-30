@@ -47,13 +47,14 @@ Spynet.prototype.listen = function(port, errback) {
   if (this.running)
     throw Error('bothan.spynet.listen: already running.');
 
-  if (this.hanging)
+  if (this.hanging) {
     return this.ee.once('listened', function(err) {
       if (!err)
         errback(null);
       else
         errback(err);
     });
+  }
 
   this.port = port || config.port;
   this.hanging = true;

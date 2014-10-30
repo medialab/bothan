@@ -24,4 +24,12 @@ describe('helpers', function() {
       );
     });
   });
+
+  describe('range', function() {
+
+    it('should properly create ranges.', function() {
+      assert.deepEqual(helpers.range(2), [0, 1]);
+      assert.deepEqual(helpers.range(4), [0, 1, 2, 3]);
+    });
+  });
 });

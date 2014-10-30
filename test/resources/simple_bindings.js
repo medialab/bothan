@@ -1,5 +1,5 @@
 module.exports = function(parent) {
-console.log('here');
+
   // Alerting parent
   parent.send('ok', {ok: true});
 

@@ -31,10 +31,12 @@ function Spy(name, args, params) {
   // Binding some of the messenger methods
   this.messenger = spynet.messenger.conversation(name);
 
-  // Killing the child process with parent
-  process.on('exit', function() {
+  this.processHandle = function() {
     self.kill();
-  });
+  };
+
+  // Killing the child process with parent
+  process.on('exit', this.processHandle);
 }
 
 util.inherits(Spy, EventEmitter);
@@ -52,7 +54,7 @@ Spy.prototype.start = function(callback) {
     reply({ok: true});
 
     callback(null);
-  };
+  }
 
   var failureTimeout = setTimeout(function() {
     self.kill();
@@ -92,6 +94,7 @@ Spy.prototype.kill = function(noDrop) {
     spynet.dropSpy(this.name);
 
   // Killing the child process
+  process.removeListener('exit', this.processHandle);
   this.phantom.kill();
 };
 

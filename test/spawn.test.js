@@ -132,4 +132,14 @@ describe('spawn', function() {
       });
     });
   });
+
+  describe('clusters', function() {
+    it('should be possible to start a cluster of four children.', function(done) {
+      bothan.deployCluster(3, function(err, cluster) {
+        assert(!err);
+        cluster.kill();
+        done();
+      });
+    });
+  });
 });

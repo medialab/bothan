@@ -5,6 +5,7 @@
  * Exports Bothan main functions.
  */
 var spawn = require('./src/spawn.js'),
+    cluster = require('./src/cluster.js'),
     config = require('./shared/config.js'),
     helpers = require('./shared/helpers.js');
 
@@ -26,6 +27,9 @@ var bothan = {
       throw Error('bothan.deploy: no valid callback provided.');
 
     return spawn(params, callback);
+  },
+  deployCluster: function(params, callback) {
+    return cluster(params, callback);
   }
 };
 

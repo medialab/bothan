@@ -77,7 +77,7 @@ Spynet.prototype.listen = function(port, errback) {
 
     // Extending the server for broadcast
     self.server.broadcast = function(data) {
-      self.clients.forEach(function(client) {
+      this.clients.forEach(function(client) {
         client.send(data);
       });
     };

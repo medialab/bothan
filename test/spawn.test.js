@@ -115,4 +115,21 @@ describe('spawn', function() {
       ], done);
     });
   });
+
+  describe('restarting', function() {
+
+    it('should be possible to restart a spy.', function(done) {
+      spawn({name: 'restarter'}, function(err, spy) {
+        assert(!err);
+
+        // Restarting
+        spy.restart(function(err) {
+          assert(!err);
+
+          spy.kill();
+          done();
+        });
+      });
+    });
+  });
 });

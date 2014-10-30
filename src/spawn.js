@@ -16,7 +16,7 @@ var path = require('path'),
     config = require('../shared/config.js');
 
 // Spy class
-function Spy(name, args) {
+function Spy(name, args, params) {
   var self = this;
 
   // Extending an Event Emitter
@@ -25,6 +25,7 @@ function Spy(name, args) {
   // Properties
   this.name = name;
   this.args = args;
+  this.params = params;
   this.phantom = null;
 
   // Binding some of the messenger methods
@@ -39,24 +40,27 @@ function Spy(name, args) {
 util.inherits(Spy, EventEmitter);
 
 // Spy Prototype
-Spy.prototype.start = function(timeout, callback) {
+Spy.prototype.start = function(callback) {
   var self = this;
 
   // Spawning child process
   this.phantom = cp.execFile(phantomjs.path, this.args);
 
   // Waiting for handshake
-  var failureTimeout = setTimeout(function() {
-    self.kill();
-    callback(new Error('handshake-timeout'));
-  }, timeout || config.handshakeTimeout);
-
-  this.messenger.once('handshake', function(data, reply) {
+  function handle(data, reply) {
     clearTimeout(failureTimeout);
     reply({ok: true});
 
     callback(null);
-  });
+  };
+
+  var failureTimeout = setTimeout(function() {
+    self.kill();
+    callback(new Error('handshake-timeout'));
+  }, this.params.handshakeTimeout || config.handshakeTimeout);
+
+  // TODO: kill this listener somewhat?
+  this.messenger.once('handshake', handle);
 
   // On stdout
   this.phantom.stdout.on('data', function(data) {
@@ -81,13 +85,19 @@ Spy.prototype.start = function(timeout, callback) {
   return this;
 };
 
-Spy.prototype.kill = function() {
+Spy.prototype.kill = function(noDrop) {
 
   // Removing from spynet
-  spynet.dropSpy(this.name);
+  if (noDrop !== false)
+    spynet.dropSpy(this.name);
 
   // Killing the child process
   this.phantom.kill();
+};
+
+Spy.prototype.restart = function(callback) {
+  this.kill(false);
+  this.start(callback);
 };
 
 // Spawner
@@ -138,10 +148,10 @@ module.exports = function(params, callback) {
       args = args.concat(helpers.toCLIArgs(params.args || {}));
 
       // Spawning
-      var spy = new Spy(name, args);
+      var spy = new Spy(name, args, params);
 
       // Starting
-      return spy.start(params.handshakeTimeout, function(err) {
+      return spy.start(function(err) {
         if (err)
           return next(err);
         else

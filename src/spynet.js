@@ -136,6 +136,9 @@ Spynet.prototype.close = function() {
   this.messenger.shoot();
   this.messenger = null;
 
+  // Dropping listeners
+  this.ee.removeAllListeners();
+
   // Dropping spies
   this.spies = {};
 

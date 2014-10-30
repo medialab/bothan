@@ -30,8 +30,13 @@ function Spynet() {
 }
 
 // Prototype
-Spynet.prototype.listen = function(port) {
+Spynet.prototype.listen = function(port, errback) {
   var self = this;
+
+  if (arguments.length < 2) {
+    errback = port;
+    port = null;
+  }
 
   if (this.running)
     throw Error('bothan.spynet: already running.');
@@ -40,6 +45,11 @@ Spynet.prototype.listen = function(port) {
 
   // Launching server
   this.server = new WebSocketServer({port: this.port});
+  if (typeof errback === 'function')
+    this.server.once('error', function(err) {
+      self.running = false;
+      errback(err);
+    });
   this.running = true;
 
   // Extending the server for broadcast
@@ -69,6 +79,7 @@ Spynet.prototype.listen = function(port) {
 
   // TODO: Handle socket disconnection
 
+  errback(null);
   return this;
 };
 

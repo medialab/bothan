@@ -5,6 +5,7 @@
  * A phantomjs child process spawner. Returns a spy object to handle.
  */
 var path = require('path'),
+    async = require('async'),
     cp = require('child_process'),
     util = require('util'),
     uuid = require('uuid'),
@@ -47,9 +48,9 @@ Spy.prototype.start = function(timeout, callback) {
 
   // Waiting for handshake
   var failureTimeout = setTimeout(function() {
-    spy.kill();
+    self.kill();
     callback(new Error('handshake-timeout'));
-  }, timeout || 5000);
+  }, timeout || config.handshakeTimeout);
 
   this.messenger.once('handshake', function(data, reply) {
     clearTimeout(failureTimeout);
@@ -93,41 +94,66 @@ Spy.prototype.kill = function() {
 
 // Spawner
 module.exports = function(params, callback) {
+  if (arguments.length < 2) {
+    callback = params;
+    params = null;
+  }
+
   params = params || {};
 
-  // Starting spynet if not running
-  if (!spynet.running)
-    spynet.listen();
+  async.series({
+    spynet: function(next) {
+      if (!spynet.running)
+        spynet.listen(function(err) {
+          if (err) {
+            if (err.code === 'EACCES' || err.code === 'EADDRINUSE')
+              return next(new Error('unavailable-port'));
+            else
+              return next(err);
+          }
+          return next(null);
+        });
+      else
+        return next(null);
+    },
+    spy: function(next) {
 
-  // Giving a name
-  var name = params.name || 'Spy[' + uuid.v4() + ']';
+      // Giving a name
+      var name = params.name || 'Spy[' + uuid.v4() + ']';
 
-  // Composing unix command
-  var args = [];
+      // Composing unix command
+      var args = [];
 
-  // Main script location
-  args.push(path.join(__dirname + '/../phantom/main.js'));
+      // Main script location
+      args.push(path.join(__dirname + '/../phantom/main.js'));
 
-  // JSON parameters
-  args.push(JSON.stringify({
-    name: name,
-    passphrase: config.passphrase,
-    port: spynet.port,
-    bindings: params.bindings || null,
-    data: params.data || {}
-  }));
+      // JSON parameters
+      args.push(JSON.stringify({
+        name: name,
+        passphrase: config.passphrase,
+        port: spynet.port,
+        bindings: params.bindings || null,
+        data: params.data || {}
+      }));
 
-  // Command line arguments for phantom
-  args = args.concat(helpers.toCLIArgs(params.args || {}));
+      // Command line arguments for phantom
+      args = args.concat(helpers.toCLIArgs(params.args || {}));
 
-  // Spawning
-  var spy = new Spy(name, args);
+      // Spawning
+      var spy = new Spy(name, args);
 
-  // Starting
-  return spy.start(params.handshakeTimeout, function(err) {
+      // Starting
+      return spy.start(params.handshakeTimeout, function(err) {
+        if (err)
+          return next(err);
+        else
+          return next(null, spy);
+      });
+    }
+  }, function(err, result) {
     if (err)
       return callback(err);
     else
-      return callback(null, spy);
+      return callback(null, result.spy);
   });
 };

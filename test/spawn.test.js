@@ -1,12 +1,34 @@
 var assert = require('assert'),
-    spawn = require('../src/spawn.js');
+    spawn = require('../src/spawn.js'),
+    bothan = require('../index.js'),
+    spynet = require('../src/spynet.js');
 
 describe('spawn', function() {
+
+  describe('error handling', function() {
+
+    it('should return an error when handshake took too long.', function(done) {
+      spawn({handshakeTimeout: 10}, function(err) {
+        assert.strictEqual(err.message, 'handshake-timeout');
+        done();
+      });
+    });
+
+    it('should return an error when trying to listen on a unavailable port.', function(done) {
+      spynet.close();
+      bothan.config({port: 80});
+      spawn(function(err) {
+        assert.strictEqual(err.message, 'unavailable-port');
+        bothan.config({port: 8074});
+        done();
+      });
+    });
+  });
 
   describe('basic cases', function() {
     it('should be able to spawn a simple phantom.', function(done) {
       spawn({name: 'simple'}, function(err, spy) {
-        assert(err === null);
+        assert(!err);
         assert(spy.name === 'simple');
         spy.kill();
         done();

@@ -1,6 +1,6 @@
 {
   "name": "bothan",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "A node.js phantom controller for scraping purposes.",
   "main": "index.js",
   "scripts": {
@@ -23,10 +23,11 @@
   },
   "homepage": "https://github.com/medialab/bothan",
   "dependencies": {
-    "ws": "~0.4.32",
-    "phantomjs": "~1.9.10",
+    "async": "^0.9.0",
     "estafet": "git+https://github.com/Yomguithereal/estafet.git",
-    "uuid": "~2.0.1"
+    "phantomjs": "~1.9.10",
+    "uuid": "~2.0.1",
+    "ws": "~0.4.32"
   },
   "devDependencies": {
     "mocha": "~1.21.4"

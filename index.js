@@ -4,9 +4,16 @@
  *
  * Exports Bothan main functions.
  */
-var spawn = require('./src/spawn.js');
+var spawn = require('./src/spawn.js'),
+    config = require('./shared/config.js'),
+    helpers = require('./shared/helpers.js');
 
-module.exports = {
+var bothan = {
+  config: function(o) {
+    if (o.port)
+      config.port = o.port;
+    return bothan;
+  },
   deploy: function(params, callback) {
     if (arguments.length === 1) {
       callback = params;
@@ -21,3 +28,10 @@ module.exports = {
     return spawn(params, callback);
   }
 };
+
+// Non-writable properties
+Object.defineProperty(bothan, 'version', {
+  value: '0.1.0'
+});
+
+module.exports = bothan;

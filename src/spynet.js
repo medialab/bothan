@@ -12,53 +12,79 @@
 // Dependencies
 var WebSocketServer = require('ws').Server,
     EventEmitter = require('events').EventEmitter,
-    http = require('http'),
-    uuid = require('uuid'),
-    Messenger = require('estafet');
+    Messenger = require('estafet'),
+    config = require('../shared/config.js');
 
-// Main class
-function Spynet(params) {
-  var self = this,
-      ee = new EventEmitter();
+// Singleton
+function Spynet() {
+  var self = this;
 
-  params = params || {};
+  // Properties
+  this.ee = new EventEmitter();
+  this.name = 'Spynet';
+  this.port = config.port;
+  this.server = null;
+  this.messenger = null;
+  this.running = false;
+  this.spies = [];
+}
+
+// Prototype
+Spynet.prototype.listen = function(port) {
+  var self = this;
+
+  if (this.running)
+    throw Error('bothan.spynet: already running.');
+
+  this.port = port || config.port;
 
   // Launching server
-  this.name = params.name || 'Spynet[' + uuid.v4() + ']';
-  this.server = new WebSocketServer({port: params.port || 8074});
-  this.port = this.server.options.port;
+  this.server = new WebSocketServer({port: this.port});
+  this.running = true;
 
-  // Extending server
-  // TODO: find way to send unilateraly
+  // Extending the server for broadcast
   this.server.broadcast = function(data) {
     this.clients.forEach(function(client) {
       client.send(data);
     });
   };
 
-  // Building messenger
+  // Building the messenger
   this.messenger = new Messenger(this.name, {
     emitter: function(data) {
       self.server.broadcast(JSON.stringify(data));
     },
     receptor: function(callback) {
-      ee.on('message', callback);
+      self.ee.on('message', callback);
     }
   });
 
   // On socket connection
+  // TODO: assign name to socket so we can be finer than broadcast
   this.server.on('connection', function(socket) {
     socket.on('message', function(data) {
-      ee.emit('message', JSON.parse(data));
+      self.ee.emit('message', JSON.parse(data));
     });
   });
 
   // TODO: Handle socket disconnection
-}
 
-// Prototype
-Spynet.prototype.close = function() {
-  return this.server.close();
+  return this;
 };
 
-module.exports = Spynet;
+Spynet.prototype.close = function() {
+
+  // Shooting messenger
+  this.messenger.shoot();
+  this.messenger = null;
+
+  // Closing server
+  this.server.close();
+  this.server = null;
+
+  // State
+  this.running = false;
+  return this;
+};
+
+module.exports = new Spynet();

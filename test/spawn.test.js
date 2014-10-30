@@ -1,13 +1,11 @@
 var assert = require('assert'),
-    Spynet = require('../src/spynet.js'),
     spawn = require('../src/spawn.js');
 
 describe('spawn', function() {
-  var spynet = new Spynet();
 
   describe('basic cases', function() {
     it('should be able to spawn a simple phantom.', function(done) {
-      spawn(spynet, {name: 'simple'}, function(err, spy) {
+      spawn({name: 'simple'}, function(err, spy) {
         assert(err === null);
         assert(spy.name === 'simple');
         spy.kill();
@@ -25,10 +23,10 @@ describe('spawn', function() {
         bindings: __dirname + '/resources/simple_bindings.js'
       };
 
-      spawn(spynet, params, function(err, createdSpy) {
+      spawn(params, function(err, createdSpy) {
         spy = createdSpy;
 
-        spynet.messenger.once('ok', function(res) {
+        spy.messenger.once('ok', function(res) {
           assert(res.ok);
           done();
         });

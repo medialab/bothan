@@ -4,16 +4,13 @@
  *
  * Exports Bothan main functions.
  */
-var Spynet = require('./src/spynet.js'),
-    spawn = require('./src/spawn.js');
+var spawn = require('./src/spawn.js');
 
 module.exports = {
-  Spynet: Spynet,
-  deploy: function(spynet, params, callback) {
-    if (arguments.length === 2) {
+  deploy: function(params, callback) {
+    if (arguments.length === 1) {
       callback = params;
-      params = spynet;
-      spynet = null;
+      params = null;
     }
 
     params = params || {};
@@ -21,15 +18,6 @@ module.exports = {
     if (typeof callback !== 'function')
       throw Error('bothan.deploy: no valid callback provided.');
 
-    if (!spynet) {
-      var spynetParams = {};
-      params.port && (spynetParams.port = params.port)
-      spynet = new Spynet(spynetParams);
-    }
-
-    if (!(spynet instanceof Spynet))
-      throw Error('bothan.deploy: provided spynet instance is not valid.');
-
-    spawn(spynet, params, callback);
+    return spawn(params, callback);
   }
 };

@@ -11,10 +11,11 @@ var path = require('path'),
     EventEmitter = require('events').EventEmitter,
     phantomjs = require('phantomjs'),
     helpers = require('../shared/helpers.js'),
+    spynet = require('./spynet.js'),
     config = require('../shared/config.js');
 
 // Spy class
-function Spy(name, spynet, phantom) {
+function Spy(name, args) {
   var self = this;
 
   // Extending an Event Emitter
@@ -22,12 +23,40 @@ function Spy(name, spynet, phantom) {
 
   // Properties
   this.name = name;
-  this.phantom = phantom;
+  this.args = args;
+  this.phantom = null;
   this.killed = false;
-  this.spynet = spynet;
 
   // Binding some of the messenger methods
   this.messenger = spynet.messenger.conversation(name);
+
+  // Killing the child process with parent
+  process.on('exit', function() {
+    self.kill();
+  });
+}
+
+util.inherits(Spy, EventEmitter);
+
+// Spy Prototype
+Spy.prototype.start = function(timeout, callback) {
+  var self = this;
+
+  // Spawning child process
+  this.phantom = cp.execFile(phantomjs.path, this.args);
+
+  // Waiting for handshake
+  var failureTimeout = setTimeout(function() {
+    spy.kill();
+    callback(new Error('handshake-timeout'));
+  }, timeout || 5000);
+
+  this.messenger.once('handshake', function(data, reply) {
+    clearTimeout(failureTimeout);
+    reply({ok: true});
+
+    callback(null);
+  });
 
   // On stdout
   this.phantom.stdout.on('data', function(data) {
@@ -45,21 +74,15 @@ function Spy(name, spynet, phantom) {
   });
 
   // On close
-  this.phantom.on('close', function(code, signal) {
+  this.phantom.once('close', function(code, signal) {
     if (!self.killed)
       self.emit('phantom:close', {code: code, signal: signal});
     self.killed;
   });
 
-  // Killing the child process with parent
-  process.on('exit', function() {
-    self.kill();
-  });
-}
+  return this;
+};
 
-util.inherits(Spy, EventEmitter);
-
-// Spy Prototype
 Spy.prototype.kill = function() {
   if (this.killed)
     return;
@@ -69,8 +92,12 @@ Spy.prototype.kill = function() {
 };
 
 // Spawner
-module.exports = function(spynet, params, callback) {
+module.exports = function(params, callback) {
   params = params || {};
+
+  // Starting spynet if not running
+  if (!spynet.running)
+    spynet.listen();
 
   // Giving a name
   var name = params.name || 'Spy[' + uuid.v4() + ']';
@@ -86,7 +113,6 @@ module.exports = function(spynet, params, callback) {
     name: name,
     passphrase: config.passphrase,
     port: spynet.port,
-    spynet: spynet.name,
     bindings: params.bindings || null,
     data: params.data || {}
   }));
@@ -95,19 +121,13 @@ module.exports = function(spynet, params, callback) {
   args = args.concat(helpers.toCLIArgs(params.args || {}));
 
   // Spawning
-  var phantom = cp.execFile(phantomjs.path, args),
-      spy = new Spy(name, spynet, phantom);
+  var spy = new Spy(name, args);
 
-  // Waiting for handshake
-  var failureTimeout = setTimeout(function() {
-    spy.kill();
-    callback(new Error('handshake-timeout'));
-  }, params.handshakeTimeout || 5000);
-
-  spy.messenger.once('handshake', function(data, reply) {
-    clearTimeout(failureTimeout);
-    reply({ok: true});
-
-    callback(null, spy);
+  // Starting
+  return spy.start(params.handshakeTimeout, function(err) {
+    if (err)
+      return callback(err);
+    else
+      return callback(null, spy);
   });
 };

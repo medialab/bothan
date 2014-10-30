@@ -21,6 +21,7 @@ function Comlink() {
   // Properties
   this.ws = null;
   this.messenger = null;
+  this.parent = null;
   this.connected = false;
   this.name = null;
 
@@ -48,8 +49,10 @@ function Comlink() {
         }
       });
 
+      self.parent = self.messenger.conversation('Spynet');
+
       // Performing handshake
-      self.messenger.to(params.spynet).request('handshake', next);
+      self.parent.request('handshake', next);
     };
   }
 }

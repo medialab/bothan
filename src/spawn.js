@@ -45,14 +45,10 @@ util.inherits(Spy, EventEmitter);
 Spy.prototype.start = function(callback) {
   var self = this;
 
-  // Spawning child process
-  this.phantom = cp.execFile(phantomjs.path, this.args);
-
   // Waiting for handshake
   function handle(data, reply) {
     clearTimeout(failureTimeout);
     reply({ok: true});
-
     callback(null);
   }
 
@@ -63,6 +59,9 @@ Spy.prototype.start = function(callback) {
 
   // TODO: kill this listener somewhat?
   this.messenger.once('handshake', handle);
+
+  // Spawning child process
+  this.phantom = cp.execFile(phantomjs.path, this.args);
 
   // On stdout
   this.phantom.stdout.on('data', function(data) {

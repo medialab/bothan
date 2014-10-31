@@ -51,6 +51,11 @@ function Comlink() {
 
       self.parent = self.messenger.conversation('Spynet');
 
+      // Perform tricks here
+      // NOTE: executing binding here to avoid racing conditions
+      if (params.bindings)
+        require(params.bindings)(self.parent, params.data);
+
       // Performing handshake
       self.parent.request('handshake', next);
     };

@@ -1,7 +1,9 @@
 module.exports = function(parent) {
 
   // Alerting parent
-  parent.send('ok', {ok: true});
+  setTimeout(function() {
+    parent.send('ok', {ok: true});
+  }, 300);
 
   // Hello
   parent.on('hello', function() {

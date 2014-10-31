@@ -26,8 +26,4 @@ comlink.setup(params, function(err) {
   // If the socket server timed out, we exit
   if (err)
     return phantom.exit(1);
-
-  // Perform tricks here
-  if (params.bindings)
-    require(params.bindings)(comlink.parent, params.data);
 });

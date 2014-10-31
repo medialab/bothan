@@ -50,7 +50,7 @@ describe('spawn', function() {
         spy = createdSpy;
 
         spy.messenger.once('ok', function(res) {
-          assert(res.ok);
+          assert(res.body.ok);
           done();
         });
       });

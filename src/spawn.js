@@ -7,6 +7,7 @@
 var path = require('path'),
     async = require('async'),
     cp = require('child_process'),
+    fs = require('fs'),
     util = require('util'),
     uuid = require('uuid'),
     EventEmitter = require('events').EventEmitter,
@@ -61,7 +62,7 @@ Spy.prototype.start = function(callback) {
   this.messenger.once('handshake', handle);
 
   // Spawning child process
-  this.phantom = cp.execFile(phantomjs.path, this.args);
+  this.phantom = cp.execFile(this.params.path || phantomjs.path, this.args);
 
   // On stdout
   this.phantom.stdout.on('data', function(data) {
@@ -112,6 +113,16 @@ module.exports = function(params, callback) {
   params = params || {};
 
   async.series({
+    path: function(next) {
+
+      if (params.path)
+        if (fs.existsSync(params.path) && fs.lstatSync(params.path).isFile())
+          return next(null);
+        else
+          return next(new Error('invalid-phantom-path'));
+      else
+        return next(null);
+    },
     spynet: function(next) {
       if (!spynet.running)
         spynet.listen(function(err) {

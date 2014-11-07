@@ -24,6 +24,13 @@ describe('spawn', function() {
         done();
       });
     });
+
+    it('should return an error when trying to launch a phantom from an inexistant path.', function(done) {
+      spawn({path: '/nophantom'}, function(err) {
+        assert.strictEqual(err.message, 'invalid-phantom-path');
+        done();
+      });
+    });
   });
 
   describe('basic cases', function() {

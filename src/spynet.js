@@ -128,8 +128,11 @@ Spynet.prototype.dropSpy = function(name) {
   if (name in this.spies)
     delete this.spies[name];
 
+  // Closing server at next tick to let code fix things up before terminating
   if (!Object.keys(this.spies).length)
-    this.close();
+    process.nextTick((function() {
+      this.close();
+    }).bind(this));
   return this;
 };
 

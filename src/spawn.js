@@ -81,7 +81,10 @@ Spy.prototype.start = function(callback) {
 
   // On close
   this.phantom.once('close', function(code, signal) {
-    self.emit('phantom:close', {code: code, signal: signal});
+    self.emit('phantom:close', code, signal);
+
+    if (code !== 0 && code !== null)
+      self.emit('phantom:crash', code);
   });
 
   return this;

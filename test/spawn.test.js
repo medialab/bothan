@@ -82,8 +82,8 @@ describe('spawn', function() {
     });
 
     it('should be possible to subscribe to the child process close.', function(done) {
-      spy.once('phantom:close', function(data) {
-        assert(data.code === 0);
+      spy.once('phantom:close', function(code, signal) {
+        assert(code === 0);
         done();
       });
 

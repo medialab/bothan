@@ -6,6 +6,7 @@
  */
 
 module.exports = {
+  autoRestart: false,
   handshakeTimeout: 5000,
   passphrase: 'Many bothans died to bring us this information.',
   path: null,

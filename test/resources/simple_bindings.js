@@ -19,4 +19,9 @@ module.exports = function(parent) {
   parent.on('close', function() {
     phantom.exit(0);
   });
+
+  // Crash
+  parent.on('crash', function() {
+    phantom.exit(1);
+  });
 };

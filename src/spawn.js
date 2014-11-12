@@ -38,6 +38,14 @@ function Spy(name, args, params) {
 
   // Killing the child process with parent
   process.on('exit', this.processHandle);
+
+  // Autorestart?
+  this.on('phantom:crash', function() {
+    if (this.params.autoRestart)
+      this.restart();
+    else
+      this.kill();
+  });
 }
 
 util.inherits(Spy, EventEmitter);
@@ -67,7 +75,6 @@ Spy.prototype.start = function(callback) {
     callback(new Error('handshake-timeout'));
   }, this.params.handshakeTimeout || config.handshakeTimeout);
 
-  // TODO: kill this listener somewhat?
   this.messenger.once('handshake', handle);
 
   // Spawning child process
@@ -99,11 +106,13 @@ Spy.prototype.start = function(callback) {
   return this;
 };
 
-Spy.prototype.kill = function(noDrop) {
+Spy.prototype.kill = function(soft) {
 
-  // Removing from spynet
-  if (noDrop !== false)
+  // Removing from spynet and killing listeners if hard kill
+  if (soft !== false) {
     spynet.dropSpy(this.name);
+    this.removeAllListeners();
+  }
 
   // Killing the child process
   process.removeListener('exit', this.processHandle);

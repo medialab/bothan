@@ -125,6 +125,25 @@ describe('spawn', function() {
 
   describe('restarting', function() {
 
+    it('should be possible to listen a spy\'s crash.', function(done) {
+      spawn(
+        {
+          name: 'crasher',
+          bindings: __dirname + '/resources/simple_bindings.js'
+        },
+        function(err, spy) {
+          assert(!err);
+
+          spy.on('phantom:crash', function(code) {
+            assert.strictEqual(code, 1);
+            done();
+          });
+
+          spy.messenger.send('crash');
+        }
+      );
+    });
+
     it('should be possible to restart a spy.', function(done) {
       var count = 0;
 

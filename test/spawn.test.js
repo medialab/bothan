@@ -164,6 +164,26 @@ describe('spawn', function() {
         });
       });
     });
+
+    it('should be possible to autorestart on crash.', function(done) {
+      spawn(
+        {
+          name: 'autoRestarter',
+          bindings: __dirname + '/resources/simple_bindings.js',
+          autoRestart: true
+        },
+        function(err, spy) {
+          assert(!err);
+
+          spy.on('phantom:ready', function() {
+            spy.kill();
+            done();
+          });
+
+          spy.messenger.send('crash');
+        }
+      );
+    });
   });
 
   describe('clusters', function() {

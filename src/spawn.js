@@ -54,6 +54,8 @@ util.inherits(Spy, EventEmitter);
 Spy.prototype.start = function(callback) {
   var self = this;
 
+  callback = callback || Function.prototype;
+
   // Waiting for handshake
   function handle(data, reply) {
 

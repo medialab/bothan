@@ -48,8 +48,17 @@ Spy.prototype.start = function(callback) {
 
   // Waiting for handshake
   function handle(data, reply) {
+
+    // Clearing the timeout
     clearTimeout(failureTimeout);
+
+    // Replying to spy
     reply({ok: true});
+
+    // Emitting events
+    self.emit('phantom:ready');
+
+    // Firing callback
     callback(null);
   }
 

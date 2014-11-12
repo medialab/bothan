@@ -126,14 +126,21 @@ describe('spawn', function() {
   describe('restarting', function() {
 
     it('should be possible to restart a spy.', function(done) {
+      var count = 0;
+
       spawn({name: 'restarter'}, function(err, spy) {
         assert(!err);
+
+        spy.on('phantom:ready', function() {
+          count++;
+        });
 
         // Restarting
         spy.restart(function(err) {
           assert(!err);
 
           spy.kill();
+          assert(count === 1);
           done();
         });
       });

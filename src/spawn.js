@@ -40,7 +40,7 @@ function Spy(name, args, params) {
   process.on('exit', this.processHandle);
 
   // Autorestart?
-  this.on('phantom:crash', function() {
+  this.on('crash', function() {
     if (this.params.autoRestart)
       this.restart();
     else
@@ -66,7 +66,7 @@ Spy.prototype.start = function(callback) {
     reply({ok: true});
 
     // Emitting events
-    self.emit('phantom:ready');
+    self.emit('ready');
 
     // Firing callback
     callback(null);
@@ -87,22 +87,22 @@ Spy.prototype.start = function(callback) {
     data = data.substring(0, data.length - 1);
 
     if (~data.search(/Error:/))
-      self.emit('phantom:error', data);
+      self.emit('error', data);
     else
-      self.emit('phantom:log', data);
+      self.emit('log', data);
   });
 
   // On stderr
   this.phantom.stderr.on('data', function(data) {
-    self.emit('phantom:error', data);
+    self.emit('error', data);
   });
 
   // On close
   this.phantom.once('close', function(code, signal) {
-    self.emit('phantom:close', code, signal);
+    self.emit('close', code, signal);
 
     if (code !== 0 && code !== null)
-      self.emit('phantom:crash', code);
+      self.emit('crash', code);
   });
 
   return this;

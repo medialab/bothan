@@ -64,7 +64,7 @@ describe('spawn', function() {
     });
 
     it('should be possible to subscribe to the child process log.', function(done) {
-      spy.once('phantom:log', function(data) {
+      spy.once('log', function(data) {
         assert.strictEqual(data, 'Hello world!');
         done();
       });
@@ -73,7 +73,7 @@ describe('spawn', function() {
     });
 
     it('should be possible to subscribe to the child process errors.', function(done) {
-      spy.once('phantom:error', function(data) {
+      spy.once('error', function(data) {
         assert(!!~data.search(/Achtung!/));
         done();
       });
@@ -82,7 +82,7 @@ describe('spawn', function() {
     });
 
     it('should be possible to subscribe to the child process close.', function(done) {
-      spy.once('phantom:close', function(code, signal) {
+      spy.once('close', function(code, signal) {
         assert(code === 0);
         done();
       });
@@ -134,7 +134,7 @@ describe('spawn', function() {
         function(err, spy) {
           assert(!err);
 
-          spy.on('phantom:crash', function(code) {
+          spy.on('crash', function(code) {
             assert.strictEqual(code, 1);
             done();
           });
@@ -150,7 +150,7 @@ describe('spawn', function() {
       spawn({name: 'restarter'}, function(err, spy) {
         assert(!err);
 
-        spy.on('phantom:ready', function() {
+        spy.on('ready', function() {
           count++;
         });
 
@@ -175,7 +175,7 @@ describe('spawn', function() {
         function(err, spy) {
           assert(!err);
 
-          spy.on('phantom:ready', function() {
+          spy.on('ready', function() {
             spy.kill();
             done();
           });

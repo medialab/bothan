@@ -83,18 +83,18 @@ Phantom children wrappers as offered by **bothan.js** are event emitters so you 
 
 *Events*
 
-* **phantom:ready**: fires when the phantom child is ready or ready again (specially after a restart).
-* **phantom:log**: fires when the phantom child logs something to stdout.
-* **phantom:error**: fires when the phantom child prints an error or ouptuts to stderr.
-* **phantom:close**: fires when the phantom child closes.
-* **phantom:crash**: fires when the pantom child crashes.
+* **ready**: fires when the phantom child is ready or ready again (specially after a restart).
+* **log**: fires when the phantom child logs something to stdout.
+* **error**: fires when the phantom child prints an error or ouptuts to stderr.
+* **close**: fires when the phantom child closes.
+* **crash**: fires when the pantom child crashes.
 
 *Example*
 
 Note that event emitting is done through node's core events [module](http://nodejs.org/api/events.html).
 
 ```js
-phantom.on('phantom:crash', function() {
+phantom.on('crash', function() {
   console.log('Phantom child crashed.');
 });
 ```

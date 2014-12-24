@@ -6,16 +6,16 @@ It is the controller used by [sandcrawler](https://github.com/medialab/sandcrawl
 
 ## Installation
 
-You can install **bothan.js** with npm. Note that by default, the library will install a correct version of phantomjs thanks to this [library](https://www.npmjs.com/package/phantomjs).
+You can install **bothan.js** with npm. Note that by default, the library will install a correct version of phantomjs thanks to this [package](https://www.npmjs.com/package/phantomjs).
 
 ```bash
 npm install bothan
 ```
 
-Or if you need the latest development version thusly:
+Or if you need the latest development version:
 
 ```bash
-npm install git+https://github.com/medialab/sandcrawler.git
+npm install git+https://github.com/medialab/bothan.git
 ```
 
 ## Concept
@@ -105,7 +105,7 @@ phantom.on('crash', function() {
 * **autoRestart** *?boolean* [`false`]: should the phantom child try to restart on crash?
 * **bindings** *?string*: path of script to pass to the phantom child so you can communicate with it.
 * **data** *?object*: arbitrary parameters to pass to the phantom child and accessible in the bindings.
-* **handshakeTimeout** *?integer* [`5000`]: time in milliseconds to perform the handshake with the phantom child.
+* **handshakeTimeout** *?integer* [`5000`]: time allowed in milliseconds to perform the handshake with the phantom child.
 * **name** *?string*: an optional name to give to the phantom child.
 * **path** *?string*: path of a custom `phantomjs` binary.
 
@@ -123,6 +123,7 @@ bothan.config({port: 5647});
 * Clusters
 * Better messenging
 * Better restarts
+* Better encapsulation
 
 ## Contribution
 [![Build Status](https://travis-ci.org/medialab/bothan.svg)](https://travis-ci.org/medialab/bothan)

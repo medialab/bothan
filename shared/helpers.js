@@ -4,6 +4,7 @@
  *
  * Useful batch of functions used by both phantomjs and nodejs scripts.
  */
+var uuid = require('uuid');
 
 // Is the var a plain object?
 function isPlainObject(v) {
@@ -47,6 +48,28 @@ function toCLIArgs(o) {
 // Creating a range
 function range(len) {
   return Array.apply(null, Array(len)).map(function (_, i) {return i;});
+}
+
+// Expect an answer from an asynchronous request
+function request(sender, receptor, data, params, callback) {
+
+  // Handling polymorphism
+  var lastArg = arguments[arguments.length - 1];
+
+  if (arguments.length < 5) {
+    callback = params;
+    params = {};
+  }
+
+  // Safeguard
+  if (typeof callback !== 'function')
+    throw Error('bothan.helpers.request: no callback supplied.');
+
+  // Unique identifier for this call
+  var id = uuid.v4();
+
+  // Declaring outcomes
+
 }
 
 module.exports = {

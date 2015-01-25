@@ -56,8 +56,8 @@ describe('spawn', function() {
       spawn(params, function(err, createdSpy) {
         spy = createdSpy;
 
-        spy.messenger.once('ok', function(res) {
-          assert(res.body.ok);
+        spy.once('ok', function(res) {
+          assert(res.ok);
           done();
         });
       });
@@ -69,7 +69,7 @@ describe('spawn', function() {
         done();
       });
 
-      spy.messenger.send('hello');
+      spy.send('hello');
     });
 
     it('should be possible to subscribe to the child process errors.', function(done) {
@@ -78,7 +78,7 @@ describe('spawn', function() {
         done();
       });
 
-      spy.messenger.send('error');
+      spy.send('error');
     });
 
     it('should be possible to subscribe to the child process close.', function(done) {
@@ -87,7 +87,7 @@ describe('spawn', function() {
         done();
       });
 
-      spy.messenger.send('close');
+      spy.send('close');
     });
 
     after(function() {
@@ -139,7 +139,7 @@ describe('spawn', function() {
             done();
           });
 
-          spy.messenger.send('crash');
+          spy.send('crash');
         }
       );
     });
@@ -180,7 +180,7 @@ describe('spawn', function() {
             done();
           });
 
-          spy.messenger.send('crash');
+          spy.send('crash');
         }
       );
     });

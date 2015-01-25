@@ -6,127 +6,12 @@
  */
 var path = require('path'),
     async = require('async'),
-    cp = require('child_process'),
     fs = require('fs'),
-    util = require('util'),
-    uuid = require('uuid'),
-    EventEmitter = require('events').EventEmitter,
-    phantomjs = require('phantomjs'),
+    Spy = require('./spy.js'),
     helpers = require('../shared/helpers.js'),
     spynet = require('./spynet.js'),
     config = require('../shared/config.js');
 
-// Spy class
-function Spy(name, args, params) {
-  var self = this;
-
-  // Extending an Event Emitter
-  EventEmitter.call(this);
-
-  // Properties
-  this.name = name;
-  this.args = args;
-  this.params = params;
-  this.phantom = null;
-
-  // Binding some of the messenger methods
-  this.messenger = spynet.messenger.conversation(name);
-
-  this.processHandle = function() {
-    self.kill();
-  };
-
-  // Killing the child process with parent
-  process.on('exit', this.processHandle);
-
-  // Autorestart?
-  this.on('crash', function() {
-    if (this.params.autoRestart)
-      this.restart();
-    else
-      this.kill();
-  });
-}
-
-util.inherits(Spy, EventEmitter);
-
-// Spy Prototype
-Spy.prototype.start = function(callback) {
-  var self = this;
-
-  callback = callback || Function.prototype;
-
-  // Waiting for handshake
-  function handle(data, reply) {
-
-    // Clearing the timeout
-    clearTimeout(failureTimeout);
-
-    // Replying to spy
-    reply({ok: true});
-
-    // Emitting events
-    self.emit('ready');
-
-    // Firing callback
-    callback(null);
-  }
-
-  var failureTimeout = setTimeout(function() {
-    self.kill();
-    callback(new Error('handshake-timeout'));
-  }, this.params.handshakeTimeout || config.handshakeTimeout);
-
-  this.messenger.once('handshake', handle);
-
-  // Spawning child process
-  this.phantom = cp.execFile(this.params.path || phantomjs.path, this.args);
-
-  // On stdout
-  this.phantom.stdout.on('data', function(data) {
-    data = data.substring(0, data.length - 1);
-
-    if (~data.search(/Error:/))
-      self.emit('error', data);
-    else
-      self.emit('log', data);
-  });
-
-  // On stderr
-  this.phantom.stderr.on('data', function(data) {
-    self.emit('error', data);
-  });
-
-  // On close
-  this.phantom.once('close', function(code, signal) {
-    self.emit('close', code, signal);
-
-    if (code !== 0 && code !== null)
-      self.emit('crash', code);
-  });
-
-  return this;
-};
-
-Spy.prototype.kill = function(soft) {
-
-  // Removing from spynet and killing listeners if hard kill
-  if (soft !== false) {
-    spynet.dropSpy(this.name);
-    this.removeAllListeners();
-  }
-
-  // Killing the child process
-  process.removeListener('exit', this.processHandle);
-  this.phantom.kill();
-};
-
-Spy.prototype.restart = function(callback) {
-  this.kill(false);
-  this.start(callback);
-};
-
-// Spawner
 module.exports = function(params, callback) {
   if (arguments.length < 2) {
     callback = params;
@@ -163,7 +48,7 @@ module.exports = function(params, callback) {
     spy: function(next) {
 
       // Giving a name
-      var name = params.name || 'Spy[' + uuid.v4() + ']';
+      var name = params.name || 'Spy[' + helpers.uuid() + ']';
 
       // Composing unix command
       var args = [];

@@ -12,25 +12,28 @@
 // Dependencies
 var WebSocketServer = require('ws').Server,
     EventEmitter = require('events').EventEmitter,
-    Messenger = require('estafet'),
+    util = require('util'),
     config = require('../shared/config.js');
 
 // Singleton
 function Spynet() {
   var self = this;
 
+  // Extending EventEmitter
+  EventEmitter.call(this);
+
   // Properties
-  this.ee = new EventEmitter();
   this.name = 'Spynet';
   this.port = config.port;
 
   this.server = null;
-  this.messenger = null;
   this.running = false;
   this.hanging = false;
   this.hang = null;
   this.spies = {};
 }
+
+util.inherits(Spynet, EventEmitter);
 
 // Prototype
 Spynet.prototype.listen = function(port, errback) {
@@ -48,7 +51,7 @@ Spynet.prototype.listen = function(port, errback) {
     throw Error('bothan.spynet.listen: already running.');
 
   if (this.hanging) {
-    return this.ee.once('listened', function(err) {
+    return this.once('listened', function(err) {
       if (!err)
         errback(null);
       else
@@ -64,7 +67,7 @@ Spynet.prototype.listen = function(port, errback) {
 
   // On error
   this.server.once('error', function(err) {
-    self.ee.emit('listened', err);
+    self.emit('listened', err);
     self.hanging = false;
     self.running = false;
     errback(err);
@@ -82,45 +85,46 @@ Spynet.prototype.listen = function(port, errback) {
       });
     };
 
-    // Building the messenger
-    self.messenger = new Messenger(self.name, {
-      emitter: function(data, to) {
-        var str = JSON.stringify(data);
-
-        if (!to)
-          self.server.broadcast(str);
-        else
-          self.spies[to].socket.send(str);
-      },
-      receptor: function(callback) {
-        self.ee.on('message', callback);
-      }
-    });
-
     // On socket connection
     self.server.on('connection', function(socket) {
 
       // On incoming message
-      socket.on('message', function(str) {
-        var data = JSON.parse(str);
+      socket.once('message', function(msg) {
+        var parsedMsg = JSON.parse(msg);
 
         // Registering socket
-        self.addSpy(data.from, socket);
-
-        self.ee.emit('message', data);
+        self.addSpy(parsedMsg.body.from, socket);
       });
     });
 
-    self.ee.emit('listened');
+    self.emit('listened');
 
     errback(null);
   });
+};
+
+Spynet.prototype.waitForHandshake = function(spy, timeout, callback) {
+  var self = this,
+      name = spy.name + ':handshake';
+
+  var failure = setTimeout(function() {
+    self.removeListener(name, listener);
+    callback(new Error('handshake-timeout'));
+  }, timeout);
+
+  var listener = function() {
+    clearTimeout(failure);
+    callback(null, self.spies[spy.name].socket);
+  };
+
+  this.once(name, listener);
 };
 
 Spynet.prototype.addSpy = function(name, socket) {
   this.spies[name] = {
     socket: socket
   };
+  this.emit(name + ':handshake');
   return this;
 };
 
@@ -140,12 +144,8 @@ Spynet.prototype.close = function() {
   if (!this.running)
     return;
 
-  // Shooting messenger
-  this.messenger.shoot();
-  this.messenger = null;
-
   // Dropping listeners
-  this.ee.removeAllListeners();
+  this.removeAllListeners();
 
   // Dropping spies
   this.spies = {};

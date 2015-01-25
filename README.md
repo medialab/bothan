@@ -2,7 +2,7 @@
 
 **bothan.js** is a low-level [phantomjs](http://phantomjs.org/) controller that can be used with node.js and initially intended to perform scraping tasks.
 
-It is the controller used by [sandcrawler](https://github.com/medialab/sandcrawler) to perform its dynamic scraping tasks.
+This controller is used by [sandcrawler](https://github.com/medialab/sandcrawler) to perform its dynamic scraping tasks.
 
 ## Installation
 
@@ -50,7 +50,7 @@ module.exports = function(parent, params) {
 var bothan = require('bothan');
 
 bothan.deploy(function(err, phantom) {
-  phantom.messenger.send('message', {hello: 'world'});
+  phantom.send('message', {hello: 'world'});
 });
 
 // With parameters

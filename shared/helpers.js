@@ -4,7 +4,14 @@
  *
  * Useful batch of functions used by both phantomjs and nodejs scripts.
  */
-var uuid = require('uuid');
+
+// Generating a uuid v4 - not robust, should improve
+function uuid() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
 
 // Is the var a plain object?
 function isPlainObject(v) {
@@ -50,12 +57,12 @@ function range(len) {
   return Array.apply(null, Array(len)).map(function (_, i) {return i;});
 }
 
+var DEFAULT_REQUEST_TIMEOUT = 2000;
+
 // Expect an answer from an asynchronous request
-function request(sender, receptor, data, params, callback) {
+function request(com, head, body, params, callback) {
 
   // Handling polymorphism
-  var lastArg = arguments[arguments.length - 1];
-
   if (arguments.length < 5) {
     callback = params;
     params = {};
@@ -66,15 +73,34 @@ function request(sender, receptor, data, params, callback) {
     throw Error('bothan.helpers.request: no callback supplied.');
 
   // Unique identifier for this call
-  var id = uuid.v4();
+  var id = uuid();
+
+  // Timeout
+  var timeout = setTimeout(function() {
+    return callback(new Error('timeout'));
+  }, params.timeout || DEFAULT_REQUEST_TIMEOUT);
 
   // Declaring outcomes
+  com.receptor(function(message) {
+    if (message.id === id && message.head === head) {
+      clearTimeout(timeout);
+      return callback(null, message.data);
+    }
+  });
 
+  // Sending message
+  com.emitter({
+    id: id,
+    head: head,
+    body: body
+  });
 }
 
 module.exports = {
   camelToHyphen: camelToHyphen,
   extend: extend,
   range: range,
-  toCLIArgs: toCLIArgs
+  request: request,
+  toCLIArgs: toCLIArgs,
+  uuid: uuid
 };

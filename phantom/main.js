@@ -10,7 +10,8 @@ var system = require('system'),
     comlink = require('./comlink.js');
 
 // Injecting polyfills
-require('./polyfills.js');
+if (phantom.version.major < 2)
+  require('./polyfills.js');
 
 // Checking CLI arguments so we get proper configuration from parent
 var params = JSON.parse(args[1]);

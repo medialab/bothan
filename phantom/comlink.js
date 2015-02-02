@@ -37,35 +37,25 @@ function Comlink() {
     this.ws.onopen = function() {
       self.connected = true;
 
-      // Creating messenger
-      var receptor = function(callback) {
-        self.ws.onmessage = function(msg) {
-          var parsedMsg = JSON.parse(msg.data);
-          self.ee.emit(parsedMsg.head, parsedMsg.body);
-          callback(parsedMsg);
-        };
-      };
-
-      var emitter = function(data) {
-        self.ws.send(JSON.stringify(data));
-      };
-
+      // Event delegation
       function delegate(name) {
         return self.ee[name].bind(self.ee);
       }
 
-      // TODO: reconstruct the parent here
+      self.ws.addEventListener('message', function(msg) {
+        var parsedMsg = JSON.parse(msg.data);
+        self.ee.emit(parsedMsg.head, parsedMsg.body);
+      });
+
+      // Constructing parent abstraction
       self.parent = {
-        request: helpers.request.bind(null, {
-          receptor: receptor,
-          emitter: emitter
-        }),
+        request: helpers.request.bind(null, self.ws),
         send: function(head, body) {
-          emitter({
+          self.ws.send(JSON.stringify({
             from: params.name,
             head: head,
             body: body
-          });
+          }));
         },
         on: delegate('on'),
         once: delegate('once'),
@@ -77,7 +67,7 @@ function Comlink() {
       if (params.bindings)
         require(params.bindings)(self.parent, params.data);
 
-      // Performing handshake
+      // Handshake
       self.parent.request('handshake', {from: params.name}, next);
     };
   };

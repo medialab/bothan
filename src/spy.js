@@ -113,7 +113,7 @@ Spy.prototype.enableCommunication = function() {
     return this;
   };
 
-  // TODO: request
+  this.request = helpers.request.bind(null, this.socket);
 };
 
 Spy.prototype.kill = function(soft) {

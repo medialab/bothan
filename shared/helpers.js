@@ -60,7 +60,7 @@ function range(len) {
 var DEFAULT_REQUEST_TIMEOUT = 2000;
 
 // Expect an answer from an asynchronous request
-function request(com, head, body, params, callback) {
+function request(socket, head, body, params, callback) {
 
   // Handling polymorphism
   if (arguments.length < 5) {
@@ -72,28 +72,61 @@ function request(com, head, body, params, callback) {
   if (typeof callback !== 'function')
     throw Error('bothan.helpers.request: no callback supplied.');
 
+  // Event functions
+  var on = socket.addEventListener ?
+    function(l) {
+      return socket.addEventListener('message', l);
+    } :
+    function(l) {
+      return socket.on('message', l);
+    };
+
+  var off = socket.removeEventListener ?
+    function(l) {
+      return socket.removeEventListener('message', l);
+    } :
+    function(l) {
+      return socket.removeListener('message', l);
+    }
+
   // Unique identifier for this call
   var id = uuid();
 
   // Timeout
   var timeout = setTimeout(function() {
+    off(listener);
     return callback(new Error('timeout'));
   }, params.timeout || DEFAULT_REQUEST_TIMEOUT);
 
   // Declaring outcomes
-  com.receptor(function(message) {
+  var listener = function(jsonData) {
+    var message = JSON.parse(typeof jsonData === 'string' ? jsonData : jsonData.data);
+
+    // Solving
     if (message.id === id && message.head === head) {
+      off(listener);
       clearTimeout(timeout);
       return callback(null, message.data);
     }
-  });
+  };
+
+  on(listener);
 
   // Sending message
-  com.emitter({
+  socket.send(JSON.stringify({
     id: id,
     head: head,
     body: body
-  });
+  }));
+
+  // Returning handful object
+  return {
+    cancel: function() {
+      clearTimeout(timeout);
+      off(listener);
+      return callback(new Error('canceled'));
+    }
+  };
 }
 
 module.exports = {

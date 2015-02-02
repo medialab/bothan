@@ -61,6 +61,7 @@ var DEFAULT_REQUEST_TIMEOUT = 2000;
 
 // Expect an answer from an asynchronous request
 function request(socket, head, body, params, callback) {
+  params = params || {};
 
   // Handling polymorphism
   if (arguments.length < 5) {
@@ -99,11 +100,11 @@ function request(socket, head, body, params, callback) {
   }, params.timeout || DEFAULT_REQUEST_TIMEOUT);
 
   // Declaring outcomes
-  var listener = function(jsonData) {
-    var message = JSON.parse(typeof jsonData === 'string' ? jsonData : jsonData.data);
+  var listener = function(event) {
+    var message = JSON.parse(typeof event === 'string' ? event : event.data);
 
     // Solving
-    if (message.id === id && message.head === head) {
+    if (message.id === id) {
       off(listener);
       clearTimeout(timeout);
       return callback(null, message.data);
@@ -129,10 +130,19 @@ function request(socket, head, body, params, callback) {
   };
 }
 
+// Replying to a request
+function replyTo(socket, id, data) {
+  return socket.send(JSON.stringify({
+    id: id,
+    body: data
+  }));
+}
+
 module.exports = {
   camelToHyphen: camelToHyphen,
   extend: extend,
   range: range,
+  replyTo: replyTo,
   request: request,
   toCLIArgs: toCLIArgs,
   uuid: uuid

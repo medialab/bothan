@@ -44,7 +44,7 @@ function Comlink() {
 
       self.ws.addEventListener('message', function(msg) {
         var parsedMsg = JSON.parse(msg.data);
-        self.ee.emit(parsedMsg.head, parsedMsg.body);
+        self.ee.emit(parsedMsg.head, parsedMsg);
       });
 
       // Constructing parent abstraction
@@ -57,18 +57,19 @@ function Comlink() {
             body: body
           }));
         },
+        replyTo: helpers.replyTo.bind(null, self.ws),
         on: delegate('on'),
         once: delegate('once'),
         removeListener: delegate('removeListener')
       };
 
-      // Perform tricks here
-      // NOTE: executing binding here to avoid racing conditions
-      if (params.bindings)
-        require(params.bindings)(self.parent, params.data);
-
       // Handshake
-      self.parent.request('handshake', {from: params.name}, next);
+      self.parent.request('handshake', {from: params.name}, function(err) {
+        if (err)
+          return next(err);
+        else
+          return next(null, self.parent);
+      });
     };
   };
 }

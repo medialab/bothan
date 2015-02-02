@@ -101,7 +101,7 @@ Spy.prototype.enableCommunication = function() {
 
   this.socket.on('message', function(msg) {
     var parsedMsg = JSON.parse(msg);
-    self.emit(parsedMsg.head, parsedMsg.body);
+    self.emit(parsedMsg.head, parsedMsg);
   });
 
   this.send = function(head, body) {
@@ -114,6 +114,7 @@ Spy.prototype.enableCommunication = function() {
   };
 
   this.request = helpers.request.bind(null, this.socket);
+  this.replyTo = helpers.request.bind(null, this.socket);
 };
 
 Spy.prototype.kill = function(soft) {

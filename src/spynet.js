@@ -13,6 +13,7 @@
 var WebSocketServer = require('ws').Server,
     EventEmitter = require('events').EventEmitter,
     util = require('util'),
+    helpers = require('../shared/helpers.js'),
     config = require('../shared/config.js');
 
 // Singleton
@@ -93,7 +94,7 @@ Spynet.prototype.listen = function(port, errback) {
         var parsedMsg = JSON.parse(msg);
 
         // Registering socket
-        self.addSpy(parsedMsg.body.from, socket);
+        self.addSpy(parsedMsg.body.from, parsedMsg.id, socket);
       });
     });
 
@@ -112,19 +113,21 @@ Spynet.prototype.waitForHandshake = function(spy, timeout, callback) {
     callback(new Error('handshake-timeout'));
   }, timeout);
 
-  var listener = function() {
+  var listener = function(reqId) {
+    var socket = self.spies[spy.name].socket;
     clearTimeout(failure);
-    callback(null, self.spies[spy.name].socket);
+    helpers.replyTo(socket, reqId);
+    callback(null, socket);
   };
 
   this.once(name, listener);
 };
 
-Spynet.prototype.addSpy = function(name, socket) {
+Spynet.prototype.addSpy = function(name, reqId, socket) {
   this.spies[name] = {
     socket: socket
   };
-  this.emit(name + ':handshake');
+  this.emit(name + ':handshake', reqId);
   return this;
 };
 

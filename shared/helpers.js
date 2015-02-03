@@ -126,6 +126,7 @@ function request(socket, head, body, params, callback) {
 
   // Returning handful object
   return {
+    id: id,
     cancel: function() {
       clearTimeout(timeout);
       off(listener);

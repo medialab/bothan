@@ -61,6 +61,49 @@ bothan.deploy({path: './bin/customphantomjs'}, function(err, phantom) {
 
 ### Methods
 
+*Send*
+
+Sends a message to the phantom child to receive.
+
+```js
+phantom.send(head, body);
+```
+
+*Request*
+
+Request something from the phantom child.
+
+```js
+phantom.request(head, body, params, function(err, response) {
+  // Deal with error
+  if (err)
+    // ...
+
+  // Handle response
+  console.log(response);
+});
+
+// Alternate signatures
+phantom.request(head, callback);
+phantom.request(head, body, callback);
+
+// Cancel a request
+var call = phantom.request(...);
+call.cancel();
+```
+
+Parameters are:
+
+* **timeout** *?integer* [`2000`]: time in milliseconds before request timeouts.
+
+*Reply*
+
+Reply to one side's request.
+
+```js
+phantom.replyTo(id, data);
+```
+
 *Kill*
 
 Kill a phantom child.

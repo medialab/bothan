@@ -61,7 +61,7 @@ bothan.deploy({path: './bin/customphantomjs'}, function(err, phantom) {
 
 ### Methods
 
-*Send*
+#### Send
 
 Sends a message to the phantom child to receive.
 
@@ -69,7 +69,7 @@ Sends a message to the phantom child to receive.
 phantom.send(head, body);
 ```
 
-*Request*
+#### Request
 
 Request something from the phantom child.
 
@@ -92,11 +92,11 @@ var call = phantom.request(...);
 call.cancel();
 ```
 
-Parameters are:
+*Parameters*:
 
 * **timeout** *?integer* [`2000`]: time in milliseconds before request timeouts.
 
-*Reply*
+#### ReplyTo
 
 Reply to one side's request.
 
@@ -104,7 +104,7 @@ Reply to one side's request.
 phantom.replyTo(id, data);
 ```
 
-*Kill*
+#### Kill
 
 Kill a phantom child.
 
@@ -112,7 +112,7 @@ Kill a phantom child.
 phantom.kill();
 ```
 
-*Restart*
+#### Restart
 
 Restarting a phantom child.
 
@@ -131,6 +131,7 @@ Phantom children wrappers as offered by **bothan.js** are event emitters so you 
 * **error**: fires when the phantom child prints an error or ouptuts to stderr.
 * **close**: fires when the phantom child closes.
 * **crash**: fires when the pantom child crashes.
+* **?anyMessage?**: fires when the phantom child emits a message through its web socket.
 
 *Example*
 

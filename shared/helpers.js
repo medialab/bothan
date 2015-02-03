@@ -64,7 +64,11 @@ function request(socket, head, body, params, callback) {
   params = params || {};
 
   // Handling polymorphism
-  if (arguments.length < 5) {
+  if (arguments.length < 4) {
+    callback = body;
+    params = {};
+  }
+  else if (arguments.length < 5) {
     callback = params;
     params = {};
   }
@@ -107,7 +111,7 @@ function request(socket, head, body, params, callback) {
     if (message.id === id) {
       off(listener);
       clearTimeout(timeout);
-      return callback(null, message.data);
+      return callback(null, message);
     }
   };
 

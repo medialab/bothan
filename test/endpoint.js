@@ -1,5 +1,3 @@
-var tests = {
-  helpers: require('./helpers.test.js'),
-  core: require('./core.test.js'),
-  spawn: require('./spawn.test.js')
-};
+require('./suites/helpers.js');
+require('./suites/core.js');
+require('./suites/spawn.js');

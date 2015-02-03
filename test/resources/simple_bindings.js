@@ -15,6 +15,18 @@ module.exports = function(parent) {
     throw new Error('Achtung!');
   });
 
+  // Request
+  parent.on('request', function(msg) {
+    parent.replyTo(msg.id, {roger: true});
+  });
+
+  // Ask
+  parent.on('ask', function() {
+    parent.request('request', function(err) {
+      console.log('received');
+    });
+  });
+
   // Close
   parent.on('close', function() {
     phantom.exit(0);

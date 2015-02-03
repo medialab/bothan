@@ -1,5 +1,5 @@
 var assert = require('assert'),
-    bothan = require('../index.js');
+    bothan = require('../../index.js');
 
 var noop = function() {};
 

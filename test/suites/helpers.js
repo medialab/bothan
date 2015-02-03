@@ -1,5 +1,5 @@
 var assert = require('assert'),
-    helpers = require('../shared/helpers.js');
+    helpers = require('../../shared/helpers.js');
 
 describe('helpers', function() {
 

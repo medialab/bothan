@@ -1,7 +1,7 @@
 var assert = require('assert'),
-    spawn = require('../src/spawn.js'),
-    bothan = require('../index.js'),
-    spynet = require('../src/spynet.js'),
+    spawn = require('../../src/spawn.js'),
+    bothan = require('../../index.js'),
+    spynet = require('../../src/spynet.js'),
     async = require('async');
 
 describe('spawn', function() {
@@ -50,7 +50,7 @@ describe('spawn', function() {
     it('should be able to execute simple bindings.', function(done) {
       var params = {
         name: 'bindings',
-        bindings: __dirname + '/resources/simple_bindings.js'
+        bindings: __dirname + '/../resources/simple_bindings.js'
       };
 
       spawn(params, function(err, createdSpy) {
@@ -81,6 +81,41 @@ describe('spawn', function() {
       spy.send('error');
     });
 
+    it('should be possible to request something from the child process.', function(done) {
+      spy.request('request', function(err, response) {
+        assert(response.body.roger);
+        done();
+      });
+    });
+
+    it('should be possible to timeout a request.', function(done) {
+      spy.request('unknown', {}, {timeout: 100}, function(err) {
+        assert.strictEqual(err.message, 'timeout');
+        done();
+      });
+    });
+
+    it('should be possible to cancel a request.', function(done) {
+      var call = spy.request('unknown', function(err) {
+        assert.strictEqual(err.message, 'canceled');
+        done();
+      });
+
+      setTimeout(function() {
+        call.cancel();
+      }, 0);
+    });
+
+    it('should be possible to receive requests from the child.', function(done) {
+      spy.once('request', function(msg) {
+        spy.replyTo(msg.id, {ok: true});
+        done();
+      });
+
+      spy.send('ask');
+    });
+
+    // TODO: handle closed socket
     it('should be possible to subscribe to the child process close.', function(done) {
       spy.once('close', function(code, signal) {
         assert(code === 0);
@@ -129,7 +164,7 @@ describe('spawn', function() {
       spawn(
         {
           name: 'crasher',
-          bindings: __dirname + '/resources/simple_bindings.js'
+          bindings: __dirname + '/../resources/simple_bindings.js'
         },
         function(err, spy) {
           assert(!err);
@@ -169,7 +204,7 @@ describe('spawn', function() {
       spawn(
         {
           name: 'autoRestarter',
-          bindings: __dirname + '/resources/simple_bindings.js',
+          bindings: __dirname + '/../resources/simple_bindings.js',
           autoRestart: true
         },
         function(err, spy) {

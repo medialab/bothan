@@ -78,7 +78,7 @@ function request(socket, head, body, params, callback) {
     throw Error('bothan.helpers.request: no callback supplied.');
 
   // Event functions
-  var on = socket.addEventListener ?
+  var on = !socket.on ?
     function(l) {
       return socket.addEventListener('message', l);
     } :

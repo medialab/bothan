@@ -92,7 +92,7 @@ function request(socket, head, body, params, callback) {
     } :
     function(l) {
       return socket.removeListener('message', l);
-    }
+    };
 
   // Unique identifier for this call
   var id = uuid();

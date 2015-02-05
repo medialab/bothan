@@ -2,7 +2,8 @@ var assert = require('assert'),
     spawn = require('../../src/spawn.js'),
     bothan = require('../../index.js'),
     spynet = require('../../src/spynet.js'),
-    async = require('async');
+    async = require('async'),
+    phantomjs2 = require('phantomjs2');
 
 describe('spawn', function() {
 
@@ -127,6 +128,23 @@ describe('spawn', function() {
 
     after(function() {
       spy.kill();
+    });
+  });
+
+  describe('phantomjs2', function() {
+
+    it('should work seamlessly with phantomjs2.', function(done) {
+      spawn({path: phantomjs2.path, bindings: __dirname + '/../resources/simple_bindings.js'}, function(err, spy) {
+        assert(err === null);
+
+        spy.once('log', function(data) {
+          assert.strictEqual(data, 'Hello world!');
+          spy.kill();
+          done();
+        });
+
+        spy.send('hello');
+      });
     });
   });
 

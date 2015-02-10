@@ -98,9 +98,16 @@ function request(socket, head, body, params, callback) {
   // Unique identifier for this call
   var id = uuid();
 
+  // Teardown helper
+  function teardown() {
+    off(listener);
+    clearTimeout(timeout);
+    cancel = Function.prototype;
+  }
+
   // Timeout
   var timeout = setTimeout(function() {
-    off(listener);
+    teardown();
     return callback(new Error('timeout'));
   }, params.timeout || DEFAULT_REQUEST_TIMEOUT);
 
@@ -110,8 +117,7 @@ function request(socket, head, body, params, callback) {
 
     // Solving
     if (message.id === id) {
-      off(listener);
-      clearTimeout(timeout);
+      teardown();
       return callback(null, message);
     }
   };
@@ -127,19 +133,19 @@ function request(socket, head, body, params, callback) {
     if (!err)
       return;
 
-    clearTimeout(timeout);
-    off(listener);
+    teardown();
     return callback(err);
   });
 
   // Returning handful object
+  var cancel = function() {
+    teardown();
+    return callback(new Error('canceled'));
+  };
+
   return {
     id: id,
-    cancel: function() {
-      clearTimeout(timeout);
-      off(listener);
-      return callback(new Error('canceled'));
-    }
+    cancel: cancel
   };
 }
 

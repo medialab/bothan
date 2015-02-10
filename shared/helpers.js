@@ -124,6 +124,9 @@ function request(socket, head, body, params, callback) {
     head: head,
     body: body
   }), function(err) {
+    if (!err)
+      return;
+
     clearTimeout(timeout);
     off(listener);
     return callback(err);

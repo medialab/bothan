@@ -4,7 +4,7 @@
   "description": "A node.js phantom interface for scraping purposes.",
   "main": "index.js",
   "scripts": {
-    "test": "gulp test",
+    "test": "mocha -R spec ./test/endpoint.js",
     "lint": "jshint src && jshint test && jshint shared && jshint phantom"
   },
   "repository": {

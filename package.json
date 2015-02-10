@@ -4,7 +4,8 @@
   "description": "A node.js phantom interface for scraping purposes.",
   "main": "index.js",
   "scripts": {
-    "test": "gulp test"
+    "test": "gulp test",
+    "lint": "jshint src && jshint test && jshint shared && jshint phantom"
   },
   "repository": {
     "type": "git",
@@ -29,9 +30,7 @@
     "ws": "^0.7.0"
   },
   "devDependencies": {
-    "gulp": "^3.8.9",
-    "gulp-jshint": "^1.8.6",
-    "gulp-mocha": "^2.0.0",
+    "jshint": "^2.6.0",
     "mocha": "~2.1.0",
     "phantomjs2": "^2.0.0"
   }

@@ -60,6 +60,7 @@ function range(len) {
 var DEFAULT_REQUEST_TIMEOUT = 2000;
 
 // Expect an answer from an asynchronous request
+// TODO: this feels somewhat leaky
 function request(socket, head, body, params, callback) {
   params = params || {};
 
@@ -122,7 +123,11 @@ function request(socket, head, body, params, callback) {
     id: id,
     head: head,
     body: body
-  }));
+  }), function(err) {
+    clearTimeout(timeout);
+    off(listener);
+    return callback(err);
+  });
 
   // Returning handful object
   return {

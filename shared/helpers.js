@@ -125,17 +125,22 @@ function request(socket, head, body, params, callback) {
   on(listener);
 
   // Sending message
-  socket.send(JSON.stringify({
+  var sendArgs = [JSON.stringify({
     id: id,
     head: head,
     body: body
-  }), function(err) {
-    if (!err)
-      return;
+  })];
 
-    teardown();
-    return callback(err);
-  });
+  if (!global.phantom)
+    sendArgs.push(function(err) {
+      if (!err)
+        return;
+
+      teardown();
+      return callback(err);
+    });
+
+  socket.send.apply(socket, sendArgs);
 
   // Returning handful object
   var cancel = function() {

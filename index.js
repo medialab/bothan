@@ -35,7 +35,7 @@ var bothan = {
 
 // Non-writable properties
 Object.defineProperty(bothan, 'version', {
-  value: '0.1.0'
+  value: '0.2.0'
 });
 
 module.exports = bothan;
